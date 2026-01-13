@@ -24,7 +24,7 @@ Validates git commit messages before execution.
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/commit-validator.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/commit-validator.sh"
           }
         ]
       }
@@ -61,7 +61,7 @@ Automatically formats files after Write/Edit operations.
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/auto-format.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/auto-format.sh"
           }
         ]
       }
@@ -88,7 +88,7 @@ Text-to-speech announcement after successful commits.
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/speak-commit.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/speak-commit.sh"
           }
         ]
       }
@@ -126,7 +126,7 @@ Injects git status and recent commits at session start.
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/session-context.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/session-context.sh"
           }
         ]
       }
@@ -155,7 +155,7 @@ Uses Claude Agent SDK to generate intelligent session summaries.
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/save-summary"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/save-summary"
           }
         ]
       }
@@ -194,7 +194,7 @@ Sends macOS desktop notifications when Claude needs attention.
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/notify.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/notify.sh"
           }
         ]
       }
@@ -212,7 +212,7 @@ Sends macOS desktop notifications when Claude needs attention.
 
 ## Complete Configuration Example
 
-Add this to `~/.claude/settings.json` (replace `PLUGIN_PATH` with actual path):
+Add this to `~/.claude/settings.json` (paths shown are for GitHub install):
 
 ```json
 {
@@ -223,7 +223,7 @@ Add this to `~/.claude/settings.json` (replace `PLUGIN_PATH` with actual path):
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/commit-validator.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/commit-validator.sh"
           }
         ]
       }
@@ -234,7 +234,7 @@ Add this to `~/.claude/settings.json` (replace `PLUGIN_PATH` with actual path):
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/auto-format.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/auto-format.sh"
           }
         ]
       },
@@ -243,7 +243,7 @@ Add this to `~/.claude/settings.json` (replace `PLUGIN_PATH` with actual path):
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/speak-commit.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/speak-commit.sh"
           }
         ]
       }
@@ -254,7 +254,7 @@ Add this to `~/.claude/settings.json` (replace `PLUGIN_PATH` with actual path):
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/session-context.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/session-context.sh"
           }
         ]
       }
@@ -264,7 +264,7 @@ Add this to `~/.claude/settings.json` (replace `PLUGIN_PATH` with actual path):
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/save-summary"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/save-summary"
           }
         ]
       }
@@ -275,7 +275,7 @@ Add this to `~/.claude/settings.json` (replace `PLUGIN_PATH` with actual path):
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/plugins/PLUGIN_PATH/hooks/notify.sh"
+            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/notify.sh"
           }
         ]
       }
@@ -286,15 +286,17 @@ Add this to `~/.claude/settings.json` (replace `PLUGIN_PATH` with actual path):
 
 ## Finding Your Plugin Path
 
-After installation via `claude plugin install`, find the path:
+After installation via `claude plugin install github:sejas/ai-code-skills`:
 
 ```bash
 # List installed plugins
 claude plugin list
 
-# Common paths:
-# - GitHub installs: ~/.claude/plugins/cache/github/USERNAME/REPO/VERSION/
-# - Local installs: ~/.claude/plugins/cache/local/PLUGIN_NAME/VERSION/
+# Plugin path for this plugin:
+# ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/
+
+# For local installs:
+# ~/.claude/plugins/cache/local/ai-code-skills/0.1.0/
 ```
 
 ## Troubleshooting
@@ -303,7 +305,7 @@ claude plugin list
 
 1. **Check permissions:**
    ```bash
-   chmod +x ~/.claude/plugins/PLUGIN_PATH/hooks/*.sh
+   chmod +x ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/*.sh
    ```
 
 2. **Verify settings.json syntax:**

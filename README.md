@@ -24,30 +24,23 @@ A comprehensive plugin that enhances your development workflow with intelligent 
 
 ## Installation
 
-### Option 1: Install from GitHub (Recommended for distribution)
+### Option 1: Install from GitHub (Recommended)
 
-1. **Create a GitHub repository** for this plugin:
-   ```bash
-   cd dev-workflow-plugin
-   git init
-   git add .
-   git commit -m "feat: initial plugin release"
-   git remote add origin https://github.com/YOUR_USERNAME/dev-workflow-plugin.git
-   git push -u origin main
-   ```
-
-2. **On any computer**, install via Claude Code:
-   ```bash
-   claude plugin install github:YOUR_USERNAME/dev-workflow-plugin
-   ```
+Install directly from GitHub:
+```bash
+claude plugin install github:sejas/ai-code-skills
+```
 
 ### Option 2: Install Locally (For testing/development)
 
-1. **Copy the plugin directory** to the target machine
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/sejas/ai-code-skills.git
+   ```
 
 2. **Install locally**:
    ```bash
-   claude plugin install /path/to/dev-workflow-plugin
+   claude plugin install /path/to/ai-code-skills
    ```
 
 ### Option 3: Manual Installation
@@ -55,10 +48,10 @@ A comprehensive plugin that enhances your development workflow with intelligent 
 1. **Copy plugin to Claude's plugins directory**:
    ```bash
    # Create a unique plugin directory
-   mkdir -p ~/.claude/plugins/cache/local/dev-workflow/0.1.0
+   mkdir -p ~/.claude/plugins/cache/local/ai-code-skills/0.1.0
 
    # Copy all plugin files
-   cp -r dev-workflow-plugin/* ~/.claude/plugins/cache/local/dev-workflow/0.1.0/
+   cp -r ai-code-skills/* ~/.claude/plugins/cache/local/ai-code-skills/0.1.0/
    ```
 
 2. **Register the plugin** in `~/.claude/plugins/installed_plugins.json`:
@@ -66,10 +59,10 @@ A comprehensive plugin that enhances your development workflow with intelligent 
    {
      "version": 2,
      "plugins": {
-       "dev-workflow@local": [
+       "ai-code-skills@local": [
          {
            "scope": "user",
-           "installPath": "/Users/YOUR_USERNAME/.claude/plugins/cache/local/dev-workflow/0.1.0",
+           "installPath": "~/.claude/plugins/cache/local/ai-code-skills/0.1.0",
            "version": "0.1.0",
            "installedAt": "2026-01-13T00:00:00.000Z",
            "lastUpdated": "2026-01-13T00:00:00.000Z"
@@ -116,10 +109,10 @@ The hooks are automatically active after installation. They will:
 Edit hooks in your installation directory:
 ```bash
 # Change commit message max length
-vi ~/.claude/plugins/cache/local/dev-workflow/0.1.0/hooks/commit-validator.sh
+vi ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/commit-validator.sh
 
 # Change text-to-speech voice
-vi ~/.claude/plugins/cache/local/dev-workflow/0.1.0/hooks/speak-commit.sh
+vi ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/speak-commit.sh
 ```
 
 ### Available macOS Voices
@@ -139,12 +132,12 @@ say -v "?"
 ## Uninstalling
 
 ```bash
-claude plugin uninstall dev-workflow
+claude plugin uninstall ai-code-skills
 ```
 
 Or manually:
 ```bash
-rm -rf ~/.claude/plugins/cache/local/dev-workflow
+rm -rf ~/.claude/plugins/cache/github/sejas/ai-code-skills
 # Remove entry from ~/.claude/plugins/installed_plugins.json
 ```
 
@@ -161,7 +154,7 @@ rm -rf ~/.claude/plugins/cache/local/dev-workflow
 ### Hooks not running?
 ```bash
 # Ensure execute permissions
-chmod +x ~/.claude/plugins/cache/local/dev-workflow/0.1.0/hooks/*.sh
+chmod +x ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/*.sh
 ```
 
 ### Skills not appearing?
@@ -183,7 +176,7 @@ say -v Samantha "Test"
 
 ### Project Structure
 ```
-dev-workflow-plugin/
+ai-code-skills/
 ├── .claude-plugin/
 │   └── plugin.json           # Plugin metadata
 ├── hooks/                    # All hook scripts
