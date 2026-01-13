@@ -25,55 +25,38 @@ A comprehensive plugin that enhances your development workflow with intelligent 
 
 ## Installation
 
-### Option 1: Install from GitHub (Recommended)
+### One-Command Install
 
-Install directly from GitHub:
+Install directly from GitHub with hooks auto-configured:
 ```bash
-claude plugin install github:sejas/ai-code-skills
+claude plugin install sejas/ai-code-skills
 ```
 
-### Option 2: Install Locally (For testing/development)
+That's it! The plugin will:
+- ✅ Install all hooks automatically
+- ✅ Register all skills/commands
+- ✅ Configure MCP servers
+- ✅ Set up executable permissions
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/sejas/ai-code-skills.git
-   ```
+No manual configuration needed!
 
-2. **Install locally**:
-   ```bash
-   claude plugin install /path/to/ai-code-skills
-   ```
+### Update
 
-### Option 3: Manual Installation
+Update to the latest version:
+```bash
+claude plugin update dev-workflow
+```
 
-1. **Copy plugin to Claude's plugins directory**:
-   ```bash
-   # Create a unique plugin directory
-   mkdir -p ~/.claude/plugins/cache/local/ai-code-skills/0.1.0
+### Development/Testing
 
-   # Copy all plugin files
-   cp -r ai-code-skills/* ~/.claude/plugins/cache/local/ai-code-skills/0.1.0/
-   ```
+Load plugin during development:
+```bash
+# From plugin directory
+claude --plugin-dir .
 
-2. **Register the plugin** in `~/.claude/plugins/installed_plugins.json`:
-   ```json
-   {
-     "version": 2,
-     "plugins": {
-       "ai-code-skills@local": [
-         {
-           "scope": "user",
-           "installPath": "~/.claude/plugins/cache/local/ai-code-skills/0.1.0",
-           "version": "0.1.0",
-           "installedAt": "2026-01-13T00:00:00.000Z",
-           "lastUpdated": "2026-01-13T00:00:00.000Z"
-         }
-       ]
-     }
-   }
-   ```
-
-3. **Restart Claude Code**
+# Or specify path
+claude --plugin-dir /path/to/ai-code-skills
+```
 
 ## Quick Start
 
@@ -106,21 +89,33 @@ The hooks are automatically active after installation. They will:
 /intent-finish
 ```
 
+## Uninstalling
+
+```bash
+claude plugin uninstall dev-workflow
+```
+
 ## Configuration
+
+All hooks are automatically configured from the plugin manifest. No manual `settings.json` editing required!
 
 ### Customize Hook Behavior
 
-Edit hooks in your installation directory:
+To customize hook behavior, edit the scripts in your local copy and use development mode:
 ```bash
-# Change commit message max length
-vi ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/commit-validator.sh
+git clone https://github.com/sejas/ai-code-skills.git
+cd ai-code-skills
 
-# Change text-to-speech voice
-vi ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/speak-commit.sh
+# Edit hooks as needed
+vi hooks/commit-validator.sh
+
+# Load with your changes
+claude --plugin-dir .
 ```
 
 ### Available macOS Voices
 
+For text-to-speech customization, edit `hooks/speak-commit.sh` and change the voice:
 ```bash
 # List all voices
 say -v "?"
@@ -133,18 +128,6 @@ say -v "?"
 # - Karen (Australian female)
 ```
 
-## Uninstalling
-
-```bash
-claude plugin uninstall ai-code-skills
-```
-
-Or manually:
-```bash
-rm -rf ~/.claude/plugins/cache/github/sejas/ai-code-skills
-# Remove entry from ~/.claude/plugins/installed_plugins.json
-```
-
 ## Requirements
 
 - **macOS** (for text-to-speech and notifications)
@@ -155,16 +138,23 @@ rm -rf ~/.claude/plugins/cache/github/sejas/ai-code-skills
 
 ## Troubleshooting
 
-### Hooks not running?
+### Plugin not loading?
 ```bash
-# Ensure execute permissions
-chmod +x ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/*.sh
+# Check installed plugins
+claude plugin list
+
+# Try reinstalling
+claude plugin uninstall dev-workflow
+claude plugin install sejas/ai-code-skills
 ```
 
-### Skills not appearing?
+### Hooks not running?
 ```bash
-# Restart Claude Code
-claude --version  # This reloads plugins
+# Debug mode to see hook execution
+claude --debug
+
+# Verify hook scripts are executable
+ls -la ~/.claude/plugins/*/dev-workflow/*/hooks/
 ```
 
 ### Text-to-speech not working?
@@ -174,6 +164,8 @@ say "Hello from Claude Code"
 
 # Check if voice exists
 say -v Samantha "Test"
+
+# macOS only - won't work on Linux
 ```
 
 ## Development
@@ -229,4 +221,19 @@ Antonio Sejas <antonio@sejas.es>
 
 ## Version
 
-0.1.0
+0.2.0
+
+### Changelog
+
+**v0.2.0** - Simplified Installation
+- ✨ Auto-configuration of all hooks via manifest
+- 🚀 One-command install: `claude plugin install sejas/ai-code-skills`
+- 📦 Hooks use `${CLAUDE_PLUGIN_ROOT}` for portable paths
+- 📝 Updated documentation to reflect simplified workflow
+- 🔄 Easy updates via `claude plugin update dev-workflow`
+
+**v0.1.0** - Initial Release
+- 8 hooks (commit validator, auto-format, text-to-speech, notifications, etc.)
+- 5 skills (commit, intent-start, intent-finish, intent-list, presentation)
+- Intent-based development workflow
+- MCP server integration for Playwright

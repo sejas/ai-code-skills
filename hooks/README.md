@@ -2,6 +2,8 @@
 
 This directory contains hook scripts that extend Claude Code's functionality. Hooks run automatically in response to specific events.
 
+**Note:** All hooks are automatically configured when you install the plugin via `claude plugin install sejas/ai-code-skills`. No manual configuration needed!
+
 ## Available Hooks
 
 ### PreToolUse Hooks (run before tool execution)
@@ -13,28 +15,10 @@ Validates git commit messages before execution.
 - Enforces conventional commit prefixes (feat, fix, docs, etc.)
 - Maximum length check (75 characters)
 - Blocks force commits (-f flag)
-
-**Configuration:**
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/commit-validator.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+- Auto-configured on plugin install
 
 **Customize validation rules:**
-Edit line 60-80 in `commit-validator.sh` to modify allowed prefixes or max length.
+Edit `commit-validator.sh` to modify allowed prefixes or max length.
 
 ---
 
@@ -51,24 +35,6 @@ Automatically formats files after Write/Edit operations.
 - `prettier` (install: `npm install -g prettier`)
 - `phpcbf` (install via Composer)
 
-**Configuration:**
-```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/auto-format.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
 
 #### `speak-commit.sh`
 Text-to-speech announcement after successful commits.
@@ -78,24 +44,6 @@ Text-to-speech announcement after successful commits.
 - Contextual announcements based on commit type
 - Runs in background (non-blocking)
 
-**Configuration:**
-```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/speak-commit.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
 
 **Customize voice:**
 Edit line 69 to change from `Samantha` to another voice:
@@ -116,24 +64,6 @@ Injects git status and recent commits at session start.
 - Displays current branch
 - Lists last 5 commits
 
-**Configuration:**
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup|resume|clear|compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/session-context.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
 
 ---
 
@@ -146,23 +76,6 @@ Uses Claude Agent SDK to generate intelligent session summaries.
 - Python 3
 - `claude-agent-sdk` (installed automatically on first run)
 
-**Configuration:**
-```json
-{
-  "hooks": {
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/save-summary"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
 
 **Output location:** `~/.claude/session-logs/SESSION_ID.md`
 
@@ -184,24 +97,6 @@ Sends macOS desktop notifications when Claude needs attention.
 **Requirements:**
 - `terminal-notifier` (install: `brew install terminal-notifier`)
 
-**Configuration:**
-```json
-{
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "permission_prompt|idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/notify.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
 
 **Common matchers:**
 - `permission_prompt` - Permission requests
@@ -210,112 +105,41 @@ Sends macOS desktop notifications when Claude needs attention.
 
 ---
 
-## Complete Configuration Example
+## Auto-Configuration
 
-Add this to `~/.claude/settings.json` (paths shown are for GitHub install):
+After installation via `claude plugin install sejas/ai-code-skills`, all hooks are automatically configured. You can view the configuration in `.claude-plugin/plugin.json`:
 
 ```json
 {
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/commit-validator.sh"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/auto-format.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/speak-commit.sh"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "startup",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/session-context.sh"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/save-summary"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "permission_prompt|idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/notify.sh"
-          }
-        ]
-      }
-    ]
+    "PreToolUse": [...],
+    "PostToolUse": [...],
+    "SessionStart": [...],
+    "SessionEnd": [...],
+    "Notification": [...]
   }
 }
 ```
 
-## Finding Your Plugin Path
-
-After installation via `claude plugin install github:sejas/ai-code-skills`:
-
-```bash
-# List installed plugins
-claude plugin list
-
-# Plugin path for this plugin:
-# ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/
-
-# For local installs:
-# ~/.claude/plugins/cache/local/ai-code-skills/0.1.0/
-```
+The plugin uses `${CLAUDE_PLUGIN_ROOT}` variable for portable path resolution.
 
 ## Troubleshooting
 
 ### Hooks not executing?
 
-1. **Check permissions:**
+1. **Check plugin is installed:**
    ```bash
-   chmod +x ~/.claude/plugins/cache/github/sejas/ai-code-skills/0.1.0/hooks/*.sh
+   claude plugin list
    ```
 
-2. **Verify settings.json syntax:**
+2. **Debug mode:**
    ```bash
-   cat ~/.claude/settings.json | jq .
+   claude --debug
    ```
 
-3. **Check Claude Code logs:**
+3. **Verify hook scripts are executable:**
    ```bash
-   claude --verbose
+   ls -la ~/.claude/plugins/*/dev-workflow/*/hooks/
    ```
 
 ### Hook errors?
@@ -328,15 +152,21 @@ Most hooks require external tools:
 ## Customization Tips
 
 ### Disable specific hooks
-Comment out or remove entries from `settings.json`.
+Clone the plugin and edit `.claude-plugin/plugin.json`, then use `claude --plugin-dir .`
 
 ### Modify hook behavior
-Edit scripts directly - they're designed to be customizable.
+Edit scripts directly - they're designed to be customizable:
+```bash
+git clone https://github.com/sejas/ai-code-skills.git
+cd ai-code-skills
+vi hooks/commit-validator.sh
+claude --plugin-dir .
+```
 
 ### Add new hooks
 1. Create script in `hooks/` directory
-2. Add hook configuration to `settings.json`
-3. Test with `claude --verbose`
+2. Add hook configuration to `.claude-plugin/plugin.json`
+3. Test with `claude --plugin-dir .`
 
 ## Hook Types Reference
 
