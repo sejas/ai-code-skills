@@ -15,12 +15,13 @@ A comprehensive plugin that enhances your development workflow with intelligent 
 7. **save-summary.py** (SessionEnd) - Python implementation for session summaries
 8. **session-context.sh** (SessionStart) - Injects git context at session start
 
-### Skills/Commands (4 total)
+### Skills/Commands (5 total)
 
 1. **/commit** - Intelligent commit message generation following repo conventions
 2. **/intent-start** - Start spec-driven development with structured intent tracking
 3. **/intent-finish** - Complete intents with PR descriptions and archiving
 4. **/intent-list** - List all open intents with progress tracking
+5. **/presentation** - Generate Marp presentations from intent specifications
 
 ## Installation
 
@@ -95,6 +96,9 @@ The hooks are automatically active after installation. They will:
 # List all open intents
 /intent-list
 
+# Create a presentation from an intent
+/presentation
+
 # Create a commit with AI-generated message
 /commit
 
@@ -145,7 +149,7 @@ rm -rf ~/.claude/plugins/cache/github/sejas/ai-code-skills
 
 - **macOS** (for text-to-speech and notifications)
 - **Git** (for all git-related hooks and skills)
-- **Node.js/npm** (optional, for prettier auto-formatting)
+- **Node.js/npm/npx** (optional, for prettier auto-formatting and Marp presentations)
 - **PHP/Composer** (optional, for PHP code formatting)
 - **Python 3 + anthropic-sdk** (optional, for AI-powered session summaries)
 
