@@ -1,0 +1,10 @@
+{
+  "name": "dev-workflow",
+  "version": "0.1.0",
+  "description": "Development workflow plugin with git hooks and intent-based development skills",
+  "author": {
+    "name": "Antonio Sejas",
+    "email": "antonio@sejas.es"
+  },
+  "license": "MIT"
+}
