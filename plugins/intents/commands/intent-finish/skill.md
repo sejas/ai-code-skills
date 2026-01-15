@@ -63,6 +63,11 @@ You are helping the user mark an intent as complete.
 
 ## Important Notes
 
+- **Base path priority:** Use the git repository root (where `.git` lives) as the base path for `.sejas/`. If not in a git repo, use the current working directory.
+- To find git root, run: `git rev-parse --show-toplevel 2>/dev/null || pwd`
+- The `.sejas/` folder should be a sibling of `.git/` (e.g., `/path/to/repo/.sejas/`)
+- Search for intents in `<base>/.sejas/open/`
+- Move completed intents to `<base>/.sejas/done/`
 - Create .sejas/done/ directory if it doesn't exist
 - Preserve all files when moving (spec.md, notes.md, pr.md, assets/)
 - Show before/after path for confirmation

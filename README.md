@@ -1,61 +1,104 @@
-# Dev Workflow Plugin for Claude Code
+# AI Code Skills for Claude Code
 
-A comprehensive plugin that enhances your development workflow with intelligent git hooks and intent-based development skills.
+A collection of focused plugins that enhance your development workflow with intelligent git hooks, intent-based development, notifications, presentations, and more.
 
-## Features
+## Plugins
 
-### Hooks (8 total)
+Organized by single responsibility principle. Choose the plugins that fit your workflow:
 
-1. **commit-validator.sh** (PreToolUse) - Validates conventional commits, enforces max length
-2. **speak-commit.sh** (PostToolUse) - Text-to-speech announcements for commits
-3. **auto-format.sh** (PostToolUse) - Auto-formats code (prettier for JS/TS, phpcbf for PHP)
-4. **notify.sh** (Notification) - macOS desktop notifications when Claude needs attention
-5. **save-summary** (SessionEnd) - AI-powered session summaries
-6. **save-summary-basic.sh** (SessionEnd) - Simple session logging
-7. **save-summary.py** (SessionEnd) - Python implementation for session summaries
-8. **session-context.sh** (SessionStart) - Injects git context at session start
+### 🎯 [Intents Plugin](./plugins/intents/)
 
-### Skills/Commands (5 total)
+Spec-driven development with intent-based task management.
 
-1. **/commit** - Intelligent commit message generation following repo conventions
-2. **/intent-start** - Start spec-driven development with structured intent tracking
-3. **/intent-finish** - Complete intents with PR descriptions and archiving
-4. **/intent-list** - List all open intents with progress tracking
-5. **/presentation** - Generate Marp presentations from intent specifications
+**Skills:**
+- `/intent-start` - Start a new intent with structured spec
+- `/intent-finish` - Complete and archive intents with PR summaries
+- `/intent-list` - View all open intents and progress
+
+### 🔔 [Notifications Plugin](./plugins/notifications/)
+
+Local and remote notifications when Claude needs attention.
+
+**Hooks:**
+- Local macOS notifications
+- Telegram alerts
+- ntfy.sh push notifications
+
+### 🎨 [Presentations Plugin](./plugins/presentations/)
+
+Generate Marp presentations from your intent specs.
+
+**Skills:**
+- `/presentation` - Create presentation slides from intent
+
+### 🔧 [Git Workflow Plugin](./plugins/git-workflow/)
+
+Git commit automation and validation.
+
+**Skills:**
+- `/commit` - Create commits with best practices
+
+**Hooks:**
+- Conventional commit validation
+- Force push prevention
+- Message length enforcement
+
+### 💻 [Development Plugin](./plugins/development/)
+
+Development workflow automation: formatting, session tracking, and audio feedback.
+
+**Hooks:**
+- Auto-code formatting (Prettier, phpcbf)
+- Session context injection (git status, branch, commits)
+- Session summaries (basic and AI-powered)
+- Audio announcements for commits (macOS)
 
 ## Installation
 
-### One-Command Install
+### Install Individual Plugins
 
-Install directly from GitHub with hooks auto-configured:
+Each plugin is independent and can be installed separately:
+
+```bash
+# Install just the plugins you need
+claude plugin install sejas/ai-code-skills@intents
+claude plugin install sejas/ai-code-skills@notifications
+claude plugin install sejas/ai-code-skills@presentations
+claude plugin install sejas/ai-code-skills@git-workflow
+claude plugin install sejas/ai-code-skills@development
+```
+
+### Install All Plugins
+
+Or install everything at once by installing the main repository:
 ```bash
 claude plugin install sejas/ai-code-skills
 ```
 
-That's it! The plugin will:
-- ✅ Install all hooks automatically
-- ✅ Register all skills/commands
-- ✅ Configure MCP servers
-- ✅ Set up executable permissions
+### Update Plugins
 
-No manual configuration needed!
-
-### Update
-
-Update to the latest version:
+Update all installed plugins to the latest version:
 ```bash
-claude plugin update dev-workflow
+# Update all plugins from this repository
+claude plugin update intents
+claude plugin update notifications
+claude plugin update presentations
+claude plugin update git-workflow
+claude plugin update development
 ```
 
 ### Development/Testing
 
-Load plugin during development:
+Load plugins during development:
 ```bash
-# From plugin directory
+# From repository root, load all plugins
 claude --plugin-dir .
 
 # Or specify path
 claude --plugin-dir /path/to/ai-code-skills
+
+# Load specific plugin
+claude --plugin-dir /path/to/ai-code-skills/plugins/intents
 ```
 
 ## Quick Start
@@ -91,31 +134,44 @@ The hooks are automatically active after installation. They will:
 
 ## Uninstalling
 
+Uninstall individual plugins:
 ```bash
-claude plugin uninstall dev-workflow
+# Uninstall specific plugins
+claude plugin uninstall intents
+claude plugin uninstall notifications
+
+# Or uninstall all at once
+claude plugin uninstall intents notifications presentations git-workflow development
 ```
 
 ## Configuration
 
-All hooks are automatically configured from the plugin manifest. No manual `settings.json` editing required!
+Each plugin is independently configured via its `plugin.json` manifest. No manual `settings.json` editing required!
 
 ### Customize Hook Behavior
 
-To customize hook behavior, edit the scripts in your local copy and use development mode:
+To customize hook behavior, clone the repository, edit the scripts, and use development mode:
 ```bash
 git clone https://github.com/sejas/ai-code-skills.git
 cd ai-code-skills
 
-# Edit hooks as needed
-vi hooks/commit-validator.sh
+# Edit a specific plugin's hooks
+vi plugins/development/hooks/auto-format.sh
 
 # Load with your changes
-claude --plugin-dir .
+claude --plugin-dir ./plugins/development
 ```
+
+### Plugin-Specific Configuration
+
+Each plugin has its own README with configuration details:
+- **Notifications** - Environment variables for Telegram, ntfy.sh, etc.
+- **Development** - Code formatter preferences
+- **All others** - No special configuration needed
 
 ### Available macOS Voices
 
-For text-to-speech customization, edit `hooks/speak-commit.sh` and change the voice:
+For text-to-speech customization in the Development plugin, edit `plugins/development/hooks/speak-commit.sh` and change the voice:
 ```bash
 # List all voices
 say -v "?"
@@ -128,33 +184,77 @@ say -v "?"
 # - Karen (Australian female)
 ```
 
+### Remote Notifications Setup
+
+Get notified on your phone or other devices when Claude needs attention!
+
+See the [Notifications Plugin README](./plugins/notifications/) for detailed setup instructions.
+
+**Quick Setup:**
+
+**Step 1: Copy the environment template**
+```bash
+cp plugins/notifications/.env.example .env
+```
+
+**Step 2: Configure your preferred notification service(s)**
+
+#### Option A: Telegram
+1. Create a bot via [@BotFather](https://t.me/BotFather) on Telegram
+2. Get your bot token and your chat ID from [@userinfobot](https://t.me/userinfobot)
+3. Add to `.env`:
+```bash
+CLAUDE_TELEGRAM_TOKEN=your-bot-token
+CLAUDE_TELEGRAM_CHAT_ID=your-chat-id
+```
+
+#### Option B: ntfy.sh
+1. Choose a unique topic name
+2. Subscribe on [ntfy.sh](https://ntfy.sh)
+3. Add to `.env`:
+```bash
+CLAUDE_NTFY_TOPIC=your-topic-name
+```
+
+**Step 3:** Remote notifications will work automatically!
+
+**Note:** The `.env` file is gitignored and will never be committed.
+
 ## Requirements
 
-- **macOS** (for text-to-speech and notifications)
-- **Git** (for all git-related hooks and skills)
-- **Node.js/npm/npx** (optional, for prettier auto-formatting and Marp presentations)
-- **PHP/Composer** (optional, for PHP code formatting)
-- **Python 3 + anthropic-sdk** (optional, for AI-powered session summaries)
+### Required
+- **Git** - For all git-related skills and hooks
+- **Claude Code** - Latest version with plugin support
+
+### Optional (by plugin)
+- **macOS** - For text-to-speech in Development plugin
+- **terminal-notifier** - For macOS notifications in Notifications plugin
+- **Node.js/npm/npx** - For prettier auto-formatting (Development) and Marp presentations (Presentations)
+- **PHP/Composer** - For PHP code formatting (Development)
+- **Python 3 + claude-agent-sdk** - For AI-powered session summaries (Development)
 
 ## Troubleshooting
 
-### Plugin not loading?
+### Plugins not loading?
 ```bash
 # Check installed plugins
 claude plugin list
 
-# Try reinstalling
-claude plugin uninstall dev-workflow
-claude plugin install sejas/ai-code-skills
+# Try reinstalling a specific plugin
+claude plugin uninstall intents
+claude plugin install sejas/ai-code-skills@intents
 ```
 
 ### Hooks not running?
 ```bash
+# Check if hooks are executable
+ls -la plugins/development/hooks/
+
+# Make hooks executable
+chmod +x plugins/*/hooks/*.sh
+
 # Debug mode to see hook execution
 claude --debug
-
-# Verify hook scripts are executable
-ls -la ~/.claude/plugins/*/dev-workflow/*/hooks/
 ```
 
 ### Text-to-speech not working?
@@ -165,39 +265,75 @@ say "Hello from Claude Code"
 # Check if voice exists
 say -v Samantha "Test"
 
-# macOS only - won't work on Linux
+# Note: macOS only - won't work on Linux
+```
+
+### Notifications not working?
+```bash
+# Verify environment variables
+echo $CLAUDE_TELEGRAM_TOKEN
+echo $CLAUDE_NTFY_TOPIC
+
+# Test Telegram manually
+curl -X POST "https://api.telegram.org/bot${CLAUDE_TELEGRAM_TOKEN}/sendMessage" \
+  -H "Content-Type: application/json" \
+  -d "{\"chat_id\": \"${CLAUDE_TELEGRAM_CHAT_ID}\", \"text\": \"Test\"}"
 ```
 
 ## Development
 
 ### Project Structure
+
 ```
 ai-code-skills/
-├── .claude-plugin/
-│   └── plugin.json           # Plugin metadata
-├── hooks/                    # All hook scripts
-│   ├── commit-validator.sh
-│   ├── speak-commit.sh
-│   ├── auto-format.sh
-│   └── ...
-├── commands/                 # All skills/commands
-│   ├── commit/
-│   │   └── skill.md
-│   ├── intent-start/
-│   │   └── skill.md
-│   └── ...
-└── README.md                # This file
+├── plugins/                          # Individual plugins
+│   ├── intents/                     # Intent management plugin
+│   │   ├── plugin.json
+│   │   ├── README.md
+│   │   └── commands/
+│   │       ├── intent-start/
+│   │       ├── intent-finish/
+│   │       └── intent-list/
+│   ├── notifications/               # Notifications plugin
+│   │   ├── plugin.json
+│   │   ├── README.md
+│   │   ├── .env.example
+│   │   └── hooks/
+│   ├── presentations/               # Presentations plugin
+│   │   ├── plugin.json
+│   │   ├── README.md
+│   │   └── commands/
+│   ├── git-workflow/                # Git workflow plugin
+│   │   ├── plugin.json
+│   │   ├── README.md
+│   │   ├── commands/
+│   │   └── hooks/
+│   └── development/                 # Development plugin
+│       ├── plugin.json
+│       ├── README.md
+│       ├── commands/
+│       └── hooks/
+├── .claude-plugin/                  # Legacy (deprecated)
+├── .mcp.json                        # MCP servers configuration
+└── README.md                        # This file
 ```
+
+### Creating New Plugins
+
+1. Create a new directory in `plugins/your-plugin/`
+2. Add `plugin.json` with metadata and hooks configuration
+3. Create `README.md` documenting the plugin
+4. Add `commands/` or `hooks/` subdirectories as needed
 
 ### Creating New Hooks
 
-1. Add script to `hooks/` directory
-2. Make executable: `chmod +x hooks/your-hook.sh`
-3. Document in this README
+1. Add script to `plugins/your-plugin/hooks/` directory
+2. Make executable: `chmod +x plugins/your-plugin/hooks/your-hook.sh`
+3. Register in `plugins/your-plugin/plugin.json`
 
 ### Creating New Skills
 
-1. Create directory in `commands/`
+1. Create directory in `plugins/your-plugin/commands/`
 2. Add `skill.md` with frontmatter:
    ```markdown
    ---
@@ -221,16 +357,22 @@ Antonio Sejas <antonio@sejas.es>
 
 ## Version
 
-0.2.0
+0.3.0
 
 ### Changelog
+
+**v0.3.0** - Split Plugins by Single Responsibility
+- 🎯 5 focused plugins (intents, notifications, presentations, git-workflow, development)
+- 📦 Each plugin with independent plugin.json and README
+- 🔄 Install only what you need or install all at once
+- 📚 Comprehensive documentation for each plugin
+- 🏗️ Cleaner architecture following single responsibility principle
 
 **v0.2.0** - Simplified Installation
 - ✨ Auto-configuration of all hooks via manifest
 - 🚀 One-command install: `claude plugin install sejas/ai-code-skills`
 - 📦 Hooks use `${CLAUDE_PLUGIN_ROOT}` for portable paths
 - 📝 Updated documentation to reflect simplified workflow
-- 🔄 Easy updates via `claude plugin update dev-workflow`
 
 **v0.1.0** - Initial Release
 - 8 hooks (commit validator, auto-format, text-to-speech, notifications, etc.)

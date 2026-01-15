@@ -1,0 +1,30 @@
+{
+  "name": "notifications",
+  "version": "0.1.0",
+  "description": "Notification delivery for Claude Code via local and remote backends (Telegram, ntfy.sh, etc.)",
+  "author": {
+    "name": "Antonio Sejas",
+    "email": "antonio@sejas.es"
+  },
+  "homepage": "https://github.com/sejas/ai-code-skills",
+  "repository": "https://github.com/sejas/ai-code-skills",
+  "license": "MIT",
+  "keywords": ["notifications", "telegram", "ntfy", "alerts"],
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt|idle_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/notify.sh"
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/remote-notify.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

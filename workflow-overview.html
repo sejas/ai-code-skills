@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Workflow Plugin - Complete Overview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .intro-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border-left: 5px solid #667eea;
+        }
+
+        .intro-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        .card-tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+        }
+
+        .hook-type {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .features {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .features li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .skill-usage {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: #333;
+            overflow-x: auto;
+        }
+
+        .hook-pipeline {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .pipeline-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .workflow-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        .workflow-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .workflow-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .workflow-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .icon-emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 40px 0;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .highlight-blue {
+            background: #e3f2fd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #1976d2;
+            font-weight: 500;
+        }
+
+        .config-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .config-info strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dev Workflow Plugin for Claude Code</h1>
+            <p>A comprehensive guide to your development environment</p>
+        </header>
+
+        <div class="content">
+            <!-- Overview Stats -->
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-number">9</div>
+                    <div class="stat-label">Hooks</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Skills/Commands</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Automation</div>
+                </div>
+            </div>
+
+            <!-- Introduction -->
+            <div class="intro-section">
+                <h2>What is the Dev Workflow Plugin?</h2>
+                <p>A sophisticated Claude Code plugin developed by Antonio Sejas that supercharges your development workflow with intelligent automation, Git integration, and intent-driven development practices. It bridges the gap between AI assistance and professional development practices.</p>
+            </div>
+
+            <!-- Personal Configuration -->
+            <div class="section">
+                <h2><span class="icon-emoji">⚙️</span>Your Personal Configuration</h2>
+                <p>As set in <span class="highlight-blue">~/.claude/CLAUDE.md</span>:</p>
+                <ul class="features" style="margin-top: 20px;">
+                    <li><strong>No online comments:</strong> Never post review comments directly on GitHub</li>
+                    <li><strong>No unsafe commits:</strong> Don't commit or stage changes without explicit approval</li>
+                    <li><strong>Clear diffs:</strong> Always provide diffs when suggesting code changes</li>
+                </ul>
+            </div>
+
+            <!-- Hooks Section -->
+            <div class="section">
+                <h2><span class="icon-emoji">🪝</span>Hooks: Automated Actions</h2>
+                <p>Hooks are scripts that run automatically in response to specific events. They handle repetitive tasks and enforce best practices without manual intervention.</p>
+
+                <div class="hook-pipeline">
+                    <div class="pipeline-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Session Start</div>
+                            <div class="step-description">Git context injected automatically</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Before Tool Use</div>
+                            <div class="step-description">Validates commits before execution</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">After Tool Use</div>
+                            <div class="step-description">Auto-formats code, announces commits</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Notifications</div>
+                            <div class="step-description">Alerts on desktop or remote device</div>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Session End</div>
+                            <div class="step-description">Saves intelligent session summaries</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 35px; color: #333; font-size: 1.3em; margin-bottom: 20px;">Available Hooks</h3>
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3><span class="icon-emoji">✔️</span>commit-validator.sh</h3>
+                        <div class="card-tag">PreToolUse</div>
+                        <div class="hook-type">Runs before tool execution</div>
+                        <p>Validates git commits before they're executed. Enforces conventional commit prefixes (feat, fix, docs, etc.) and checks message length.</p>
+                        <ul class="features">
+                            <li>Enforces conventional commit format</li>
+                            <li>Maximum 75 characters per message</li>
+                            <li>Blocks force commits (-f flag)</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">🎨</span>auto-format.sh</h3>
+                        <div class="card-tag">PostToolUse</div>
+                        <div class="hook-type">Runs after Write/Edit operations</div>
+                        <p>Automatically formats your code after making changes. Supports TypeScript/JavaScript (Prettier) and PHP (PHPCBF).</p>
+                        <ul class="features">
+                            <li>Prettier for JS/TS files</li>
+                            <li>PHPCBF for PHP files</li>
+                            <li>Runs silently in background</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">🎤</span>speak-commit.sh</h3>
+                        <div class="card-tag">PostToolUse</div>
+                        <div class="hook-type">Runs after commits</div>
+                        <p>Text-to-speech announcements for commits. Get audible feedback with contextual messages based on commit type.</p>
+                        <ul class="features">
+                            <li>Speaks repo name and commit message</li>
+                            <li>Contextual announcements</li>
+                            <li>Non-blocking background execution</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">📍</span>session-context.sh</h3>
+                        <div class="card-tag">SessionStart</div>
+                        <div class="hook-type">Runs when session begins</div>
+                        <p>Injects Git context at the start of each session. Shows uncommitted changes, current branch, and recent commits.</p>
+                        <ul class="features">
+                            <li>Shows uncommitted changes</li>
+                            <li>Displays current branch</li>
+                            <li>Lists last 5 commits</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">💾</span>save-summary-basic.sh</h3>
+                        <div class="card-tag">SessionEnd</div>
+                        <div class="hook-type">Runs when session ends</div>
+                        <p>Simple session logging without AI summarization. Lightweight alternative for basic activity tracking.</p>
+                        <ul class="features">
+                            <li>Simple logging output</li>
+                            <li>Lightweight and fast</li>
+                            <li>Output to ~/.claude/session-log.txt</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">🔔</span>notify.sh</h3>
+                        <div class="card-tag">Notification</div>
+                        <div class="hook-type">Sends macOS notifications</div>
+                        <p>Desktop notifications when Claude needs attention (permissions, waiting for input). Requires terminal-notifier.</p>
+                        <ul class="features">
+                            <li>Permission request notifications</li>
+                            <li>Idle prompt alerts</li>
+                            <li>Authentication notifications</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">📱</span>remote-notify.sh</h3>
+                        <div class="card-tag">Notification</div>
+                        <div class="hook-type">Remote notifications</div>
+                        <p>Send notifications to your phone or other devices. Supports Telegram and ntfy.sh with more backends coming.</p>
+                        <ul class="features">
+                            <li>Telegram integration</li>
+                            <li>ntfy.sh support</li>
+                            <li>Multiple backends simultaneously</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">🤖</span>save-summary.py</h3>
+                        <div class="card-tag">SessionEnd</div>
+                        <div class="hook-type">AI-powered summaries</div>
+                        <p>Python implementation for intelligent session summaries using the Anthropic SDK. Generates contextual activity reports.</p>
+                        <ul class="features">
+                            <li>AI-powered summarization</li>
+                            <li>Requires Python 3 + claude-agent-sdk</li>
+                            <li>Output to ~/.claude/session-logs/</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="section">
+                <h2><span class="icon-emoji">⚡</span>Skills/Commands: Guided Workflows</h2>
+                <p>Skills are user-invocable commands that provide guided, step-by-step workflows for common development tasks. Invoke them using the <span class="highlight-blue">/command-name</span> syntax.</p>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3><span class="icon-emoji">💬</span>/commit</h3>
+                        <p>Generate intelligent commit messages following your repository's conventions automatically.</p>
+                        <div class="skill-usage">/commit</div>
+                        <ul class="features">
+                            <li>Analyzes staged changes</li>
+                            <li>Follows conventional commits</li>
+                            <li>Auto-generates message</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">🎯</span>/intent-start</h3>
+                        <p>Begin spec-driven development with structured intent tracking. Document your goal before implementation.</p>
+                        <div class="skill-usage">/intent-start</div>
+                        <ul class="features">
+                            <li>Creates intent specification</li>
+                            <li>Documents problem & solution</li>
+                            <li>Tracks requirements</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">✅</span>/intent-finish</h3>
+                        <p>Complete an intent and automatically generate PR descriptions with full context.</p>
+                        <div class="skill-usage">/intent-finish</div>
+                        <ul class="features">
+                            <li>Marks intent as complete</li>
+                            <li>Generates PR description</li>
+                            <li>Archives intent</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">📋</span>/intent-list</h3>
+                        <p>View all open intents with progress tracking. Keep organized and see what's being worked on.</p>
+                        <div class="skill-usage">/intent-list</div>
+                        <ul class="features">
+                            <li>Lists all open intents</li>
+                            <li>Shows progress status</li>
+                            <li>Organized view</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3><span class="icon-emoji">🎨</span>/presentation</h3>
+                        <p>Generate Marp presentations directly from your intent specifications. Perfect for demos and reviews.</p>
+                        <div class="skill-usage">/presentation</div>
+                        <ul class="features">
+                            <li>Creates Marp slides</li>
+                            <li>From intent specs</li>
+                            <li>Professional formatting</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Overview -->
+            <div class="section">
+                <h2><span class="icon-emoji">🔄</span>Complete Workflow Lifecycle</h2>
+                <table class="workflow-table">
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>Hook/Skill</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Session Start</strong></td>
+                            <td>session-context.sh</td>
+                            <td>Git status and recent commits injected</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Plan Work</strong></td>
+                            <td>/intent-start</td>
+                            <td>Document goal and requirements</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Code Changes</strong></td>
+                            <td>auto-format.sh</td>
+                            <td>Code automatically formatted after edits</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Before Commit</strong></td>
+                            <td>commit-validator.sh</td>
+                            <td>Validates commit message format</td>
+                        </tr>
+                        <tr>
+                            <td><strong>On Commit</strong></td>
+                            <td>speak-commit.sh</td>
+                            <td>Audio announcement of commit</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Waiting Input</strong></td>
+                            <td>notify.sh / remote-notify.sh</td>
+                            <td>Notifications on desktop or phone</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Finish Intent</strong></td>
+                            <td>/intent-finish</td>
+                            <td>Generate PR description and archive</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Create Demo</strong></td>
+                            <td>/presentation</td>
+                            <td>Generate presentation slides</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Session End</strong></td>
+                            <td>save-summary*.sh</td>
+                            <td>Session logged or AI-summarized</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Installation Info -->
+            <div class="section">
+                <h2><span class="icon-emoji">📦</span>Installation & Configuration</h2>
+                <div class="config-info">
+                    <strong>⚡ One-Command Install:</strong> All hooks and skills are auto-configured when installed.
+                    <pre style="margin-top: 10px; background: white; padding: 10px; border-radius: 4px; overflow-x: auto;">claude plugin install sejas/ai-code-skills</pre>
+                </div>
+
+                <h3 style="margin-top: 25px; color: #333; font-size: 1.1em; margin-bottom: 15px;">Plugin Configuration</h3>
+                <p>Your plugin configuration is in: <span class="highlight-blue">.claude-plugin/plugin.json</span></p>
+                <p style="margin-top: 10px;">Configured Hook Types:</p>
+                <ul class="features" style="margin-top: 15px;">
+                    <li><strong>PreToolUse:</strong> commit-validator.sh (validates commits)</li>
+                    <li><strong>PostToolUse:</strong> auto-format.sh, speak-commit.sh</li>
+                    <li><strong>SessionStart:</strong> session-context.sh (Git context)</li>
+                    <li><strong>SessionEnd:</strong> save-summary-basic.sh (session logging)</li>
+                    <li><strong>Notification:</strong> notify.sh, remote-notify.sh</li>
+                </ul>
+            </div>
+
+            <!-- Requirements -->
+            <div class="section">
+                <h2><span class="icon-emoji">⚙️</span>Requirements</h2>
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>Essential</h3>
+                        <ul class="features">
+                            <li>macOS (for notifications & TTS)</li>
+                            <li>Git (all git features)</li>
+                            <li>Claude Code CLI</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Optional (Features)</h3>
+                        <ul class="features">
+                            <li>Node.js/npm (code formatting, Marp)</li>
+                            <li>PHP/Composer (PHP formatting)</li>
+                            <li>Python 3 (AI summaries)</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Optional (Notifications)</h3>
+                        <ul class="features">
+                            <li>terminal-notifier (desktop)</li>
+                            <li>Telegram bot (phone)</li>
+                            <li>ntfy.sh (web/mobile)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Benefits -->
+            <div class="section">
+                <h2><span class="icon-emoji">🎯</span>Key Benefits</h2>
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>Automation</h3>
+                        <p>Eliminates repetitive tasks through intelligent hooks and automated formatting.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Best Practices</h3>
+                        <p>Enforces conventional commits, code formatting, and intent-driven development.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Transparency</h3>
+                        <p>Audio and visual feedback keep you aware of AI actions and decisions.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Productivity</h3>
+                        <p>Structured workflows reduce cognitive load and accelerate development.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Documentation</h3>
+                        <p>Intent-based development auto-generates PR descriptions and presentations.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Awareness</h3>
+                        <p>Remote notifications keep you informed even when away from your computer.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Dev Workflow Plugin v0.2.0</strong> by Antonio Sejas</p>
+            <p>GitHub: <a href="https://github.com/sejas/ai-code-skills" style="color: #667eea; text-decoration: none;">github.com/sejas/ai-code-skills</a></p>
+            <p>License: MIT | Updated: January 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

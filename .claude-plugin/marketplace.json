@@ -1,0 +1,32 @@
+{
+  "name": "sejas-tools",
+  "owner": {
+    "name": "Antonio Sejas",
+    "email": "antonio@sejas.es"
+  },
+  "metadata": {
+    "description": "Development workflow automation and intent-driven development tools",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "dev-workflow",
+      "source": {
+        "source": "github",
+        "repo": "sejas/ai-code-skills"
+      },
+      "description": "Development workflow plugin with git hooks and intent-based development skills",
+      "version": "0.2.0",
+      "author": {
+        "name": "Antonio Sejas",
+        "email": "antonio@sejas.es"
+      },
+      "homepage": "https://github.com/sejas/ai-code-skills",
+      "repository": "https://github.com/sejas/ai-code-skills",
+      "license": "MIT",
+      "keywords": ["git", "workflow", "productivity", "development", "intent-driven"],
+      "category": "productivity",
+      "tags": ["git-hooks", "automation", "development-workflow"]
+    }
+  ]
+}

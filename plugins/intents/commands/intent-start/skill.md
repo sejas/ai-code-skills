@@ -17,6 +17,7 @@ You are helping the user start a new intent using spec-driven development.
    - "What's the proposed solution?"
    - "What are the key requirements?" (list 3-5 items)
    - "What are the acceptance criteria?" (how do we know it's done?)
+   - "What's the implementation plan?" (break down into 3-7 concrete steps)
 
 4. Create the folder structure:
    ```
@@ -48,6 +49,13 @@ You are helping the user start a new intent using spec-driven development.
    - [ ] Criteria 1
    - [ ] Criteria 2
 
+   ## Implementation Plan
+   1. [Step 1]
+   2. [Step 2]
+   3. [Step 3]
+   4. [Step 4]
+   5. [Step 5]
+
    ## Notes
    [Any additional context]
    ```
@@ -61,10 +69,20 @@ You are helping the user start a new intent using spec-driven development.
    - [Any initial notes from the conversation]
    ```
 
-7. Confirm intent creation and show the path
+7. Create a todo list using TodoWrite tool:
+   - Convert each step from the implementation plan into a todo item
+   - Set all items to "pending" status
+   - Use the imperative form for content (e.g., "Implement feature X")
+   - Use the present continuous form for activeForm (e.g., "Implementing feature X")
+   - This helps track progress throughout the intent lifecycle
+
+8. Confirm intent creation and show the path
 
 ## Important Notes
 
+- **Base path priority:** Use the git repository root (where `.git` lives) as the base path for `.sejas/`. If not in a git repo, use the current working directory.
+- To find git root, run: `git rev-parse --show-toplevel 2>/dev/null || pwd`
+- The `.sejas/` folder should be a sibling of `.git/` (e.g., `/path/to/repo/.sejas/`)
 - Use today's date for folder name
 - Keep folder name lowercase with hyphens
 - Create .sejas/open/ directory if it doesn't exist

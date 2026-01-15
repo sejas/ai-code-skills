@@ -1,0 +1,13 @@
+{
+  "name": "presentations",
+  "version": "0.1.0",
+  "description": "Generate Marp presentations from intent specifications",
+  "author": {
+    "name": "Antonio Sejas",
+    "email": "antonio@sejas.es"
+  },
+  "homepage": "https://github.com/sejas/ai-code-skills",
+  "repository": "https://github.com/sejas/ai-code-skills",
+  "license": "MIT",
+  "keywords": ["presentations", "marp", "slides", "documentation"]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "intents",
+  "version": "0.1.0",
+  "description": "Spec-driven development with intent-based task management",
+  "author": {
+    "name": "Antonio Sejas",
+    "email": "antonio@sejas.es"
+  },
+  "homepage": "https://github.com/sejas/ai-code-skills",
+  "repository": "https://github.com/sejas/ai-code-skills",
+  "license": "MIT",
+  "keywords": ["intent-driven", "spec-driven", "productivity", "development"]
+}

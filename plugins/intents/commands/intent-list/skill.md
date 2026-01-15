@@ -37,6 +37,11 @@ You are helping the user view their intents.
 
 ## Important Notes
 
+- **Base path priority:** Use the git repository root (where `.git` lives) as the base path for `.sejas/`. If not in a git repo, use the current working directory.
+- To find git root, run: `git rev-parse --show-toplevel 2>/dev/null || pwd`
+- The `.sejas/` folder should be a sibling of `.git/` (e.g., `/path/to/repo/.sejas/`)
+- Search for open intents in `<base>/.sejas/open/`
+- Search for done intents in `<base>/.sejas/done/`
 - Count checkboxes in spec.md to show progress (e.g., "3/5 requirements completed")
 - Sort by date (newest first)
 - Make the output scannable and concise
