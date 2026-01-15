@@ -31,18 +31,6 @@ Generate Marp presentations from your intent specs.
 **Skills:**
 - `/presentation` - Create presentation slides from intent
 
-### 🔧 [Git Workflow Plugin](./plugins/git-workflow/)
-
-Git commit automation and validation.
-
-**Skills:**
-- `/commit` - Create commits with best practices
-
-**Hooks:**
-- Conventional commit validation
-- Force push prevention
-- Message length enforcement
-
 ### 💻 [Development Plugin](./plugins/development/)
 
 Development workflow automation: formatting, session tracking, and audio feedback.
@@ -64,7 +52,6 @@ Each plugin is independent and can be installed separately:
 claude plugin install sejas/ai-code-skills@intents
 claude plugin install sejas/ai-code-skills@notifications
 claude plugin install sejas/ai-code-skills@presentations
-claude plugin install sejas/ai-code-skills@git-workflow
 claude plugin install sejas/ai-code-skills@development
 ```
 
@@ -83,7 +70,6 @@ Update all installed plugins to the latest version:
 claude plugin update intents
 claude plugin update notifications
 claude plugin update presentations
-claude plugin update git-workflow
 claude plugin update development
 ```
 
@@ -141,7 +127,7 @@ claude plugin uninstall intents
 claude plugin uninstall notifications
 
 # Or uninstall all at once
-claude plugin uninstall intents notifications presentations git-workflow development
+claude plugin uninstall intents notifications presentations development
 ```
 
 ## Configuration
@@ -303,11 +289,6 @@ ai-code-skills/
 │   │   ├── plugin.json
 │   │   ├── README.md
 │   │   └── commands/
-│   ├── git-workflow/                # Git workflow plugin
-│   │   ├── plugin.json
-│   │   ├── README.md
-│   │   ├── commands/
-│   │   └── hooks/
 │   └── development/                 # Development plugin
 │       ├── plugin.json
 │       ├── README.md
@@ -353,7 +334,7 @@ MIT
 
 ## Author
 
-Antonio Sejas <antonio@sejas.es>
+Antonio Sejas
 
 ## Version
 
@@ -362,7 +343,7 @@ Antonio Sejas <antonio@sejas.es>
 ### Changelog
 
 **v0.3.0** - Split Plugins by Single Responsibility
-- 🎯 5 focused plugins (intents, notifications, presentations, git-workflow, development)
+- 🎯 5 focused plugins (intents, notifications, presentations, development)
 - 📦 Each plugin with independent plugin.json and README
 - 🔄 Install only what you need or install all at once
 - 📚 Comprehensive documentation for each plugin
