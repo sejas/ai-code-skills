@@ -1,7 +1,7 @@
 {
   "name": "development",
   "version": "0.1.0",
-  "description": "Development workflow automation: code formatting, session tracking, and quality checks",
+  "description": "Development workflow tools for code review and collaboration",
   "author": {
     "name": "Antonio Sejas",
     "email": "antonio@sejas.es"
@@ -9,48 +9,5 @@
   "homepage": "https://github.com/sejas/ai-code-skills",
   "repository": "https://github.com/sejas/ai-code-skills",
   "license": "MIT",
-  "keywords": ["formatting", "quality", "automation", "development"],
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/auto-format.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/speak-commit.sh"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "startup|resume|clear|compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-context.sh"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/save-summary-basic.sh"
-          }
-        ]
-      }
-    ]
-  }
+  "keywords": ["code-review", "pr-review", "github", "development", "workflow"]
 }

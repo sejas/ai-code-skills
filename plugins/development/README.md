@@ -1,10 +1,34 @@
 # Development Plugin
 
-Development workflow automation: code formatting, session tracking, and quality checks.
+Development workflow automation: code formatting, session tracking, code review, and quality checks.
 
 ## Overview
 
-This plugin enhances your development experience with automatic code formatting, session summaries, and audio feedback. It helps maintain code quality and provides helpful context at the start of each session.
+This plugin enhances your development experience with automatic code formatting, session summaries, PR code reviews, and audio feedback. It helps maintain code quality and provides helpful context at the start of each session.
+
+## Commands
+
+### `/pr-review` - Pull Request Review
+
+List PRs awaiting your review, checkout the branch, run linter, and generate a structured code review document.
+
+**Features:**
+- Lists all PRs where you're requested as reviewer
+- Shows review status (Needs Review / Already Reviewed)
+- Prioritizes unreviewed PRs first
+- Checks out selected PR branch
+- Auto-detects and runs project linter
+- Generates `pr-review.md` with structured feedback
+
+**Usage:**
+```
+/pr-review
+```
+
+**Review Focus:**
+- Readability: naming, structure, comments
+- Maintainability: DRY, separation of concerns, testability
+- Best Practices: error handling, security, performance
 
 ## Hooks
 
