@@ -19,7 +19,13 @@ You are helping the user start a new intent using spec-driven development.
    - "What are the acceptance criteria?" (how do we know it's done?)
    - "What's the implementation plan?" (break down into 3-7 concrete steps)
 
-4. Create the folder structure:
+4. **Explore the codebase** to identify relevant code:
+   - Search for files related to the feature/bug being worked on
+   - Identify key entry points, functions, or components that will be modified
+   - Find related tests or documentation
+   - Note any dependencies or connected modules
+
+5. Create the folder structure:
    ```
    .sejas/open/YYYY-MM-DD-description/
    ├── spec.md
@@ -27,7 +33,7 @@ You are helping the user start a new intent using spec-driven development.
    └── assets/
    ```
 
-5. Write **spec.md** with this structure:
+6. Write **spec.md** with this structure:
    ```markdown
    # [Intent Title]
 
@@ -56,11 +62,40 @@ You are helping the user start a new intent using spec-driven development.
    4. [Step 4]
    5. [Step 5]
 
+   ## Relevant Code
+
+   ### Key Files
+   | File | Purpose |
+   |------|---------|
+   | `path/to/file.ts:42` | Brief description of relevance |
+   | `path/to/another.ts:15-30` | Brief description of relevance |
+
+   ### Code Snippets
+   <!-- Include key code snippets that are central to this intent -->
+
+   **[filename.ts:line]** - Description
+   ```typescript
+   // Relevant code snippet
+   ```
+
+   ## Architecture (Optional)
+   <!-- Include Mermaid diagrams when they help visualize: -->
+   <!-- - Data flow between components -->
+   <!-- - State transitions -->
+   <!-- - Sequence of operations -->
+   <!-- - System architecture changes -->
+
+   ```mermaid
+   flowchart TD
+       A[Component A] --> B[Component B]
+       B --> C[Component C]
+   ```
+
    ## Notes
    [Any additional context]
    ```
 
-6. Write **notes.md** with:
+7. Write **notes.md** with:
    ```markdown
    # Development Notes
 
@@ -69,14 +104,14 @@ You are helping the user start a new intent using spec-driven development.
    - [Any initial notes from the conversation]
    ```
 
-7. Create a todo list using TodoWrite tool:
+8. Create a todo list using TodoWrite tool:
    - Convert each step from the implementation plan into a todo item
    - Set all items to "pending" status
    - Use the imperative form for content (e.g., "Implement feature X")
    - Use the present continuous form for activeForm (e.g., "Implementing feature X")
    - This helps track progress throughout the intent lifecycle
 
-8. Confirm intent creation and show the path
+9. Confirm intent creation and show the path
 
 ## Important Notes
 
@@ -87,3 +122,37 @@ You are helping the user start a new intent using spec-driven development.
 - Keep folder name lowercase with hyphens
 - Create .sejas/open/ directory if it doesn't exist
 - Add .sejas to .gitignore (both global ~/.gitignore_global and local if in a repo)
+
+## Code Context Guidelines
+
+When documenting relevant code:
+
+- **Use relative paths** from the repository root (e.g., `src/components/Button.tsx:42`)
+- **Include line numbers** for specific functions or sections (e.g., `:42` or `:15-30` for ranges)
+- **Keep snippets focused** - only include the most relevant 5-15 lines, not entire files
+- **Prioritize entry points** - document where the change begins (handlers, API endpoints, etc.)
+
+## Mermaid Chart Guidelines
+
+Include Mermaid diagrams when they help visualize:
+
+- **Flowcharts** - for complex logic or decision trees
+- **Sequence diagrams** - for multi-component interactions or API flows
+- **State diagrams** - for state machine changes
+- **Entity relationships** - for data model changes
+
+Skip diagrams for:
+
+- Simple, linear implementations
+- Single-file changes
+- Bug fixes with obvious flow
+
+Supported diagram types:
+
+```text
+flowchart TD    - Top-down flowchart
+sequenceDiagram - Interaction between components
+stateDiagram-v2 - State transitions
+erDiagram       - Entity relationships
+classDiagram    - Class structures
+```
