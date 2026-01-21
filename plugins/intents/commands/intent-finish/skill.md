@@ -10,7 +10,7 @@ You are helping the user mark an intent as complete.
 
 ## Workflow
 
-1. Check `~/.claude-intents/open/` for intents filtered by current repository:
+1. Check `~/.claude-intents/in-progress/` for intents filtered by current repository:
    - Get current repository name: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
    - List only intents where the folder name contains the current repository name
    - Intent folder format: `YYYY-mm-dd-{repository-name}-{intent-description}`
@@ -35,7 +35,7 @@ You are helping the user mark an intent as complete.
    - Add completion date
    - Add PR link (if provided)
    - Add "## Completion Summary" section with final notes
-9. Move the entire intent folder from `~/.claude-intents/open/` to `~/.claude-intents/done/`
+9. Move the entire intent folder from `~/.claude-intents/in-progress/` to `~/.claude-intents/done/`
 10. Confirm the intent has been marked as complete and show the summary.md content
 
 ## Example spec.md update
@@ -96,7 +96,7 @@ index abc123..def456 100644
 - **Intents folder:** All intents are stored in `~/.claude-intents/`
 - **Repository filtering:** Only show intents that match the current repository name. Get repository name with: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
 - Intent folder naming format: `YYYY-mm-dd-{repository-name}-{intent-description}`
-- Search for intents in `~/.claude-intents/open/`
+- Search for intents in `~/.claude-intents/in-progress/`
 - Move completed intents to `~/.claude-intents/done/`
 - Create `~/.claude-intents/done/` directory if it doesn't exist
 - Preserve all files when moving (spec.md, notes.md, summary.md, fix.diff)

@@ -29,7 +29,7 @@ You are helping the user start a new intent using spec-driven development.
 
 5. Create the folder structure:
    ```
-   ~/.claude-intents/open/YYYY-MM-DD-{repository-name}-{intent-description}/
+   ~/.claude-intents/in-progress/YYYY-MM-DD-{repository-name}-{intent-description}/
    ├── spec.md
    └── notes.md
    ```
@@ -121,7 +121,7 @@ You are helping the user start a new intent using spec-driven development.
 - If not in a git repo, use the current folder name as repository name
 - Use today's date for folder name
 - Keep folder name lowercase with hyphens
-- Create `~/.claude-intents/open/` directory if it doesn't exist
+- Create `~/.claude-intents/in-progress/` directory if it doesn't exist
 - Since intents are stored outside the repo (in `~/.claude-intents`), no gitignore changes are needed
 
 ## Code Context Guidelines

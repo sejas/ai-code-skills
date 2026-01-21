@@ -13,8 +13,8 @@ You are helping the user view their intents.
 1. Intents folder is `~/.claude-intents/`
 2. Get current repository name for filtering:
    - Run: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
-3. Check if `{intents_folder}/open/` exists
-4. List all folders in `{intents_folder}/open/`
+3. Check if `{intents_folder}/in-progress/` exists
+4. List all folders in `{intents_folder}/in-progress/`
 5. Filter intents by current repository:
    - Intent folder format: `YYYY-mm-dd-{repository-name}-{intent-description}`
    - Only show intents where the folder name contains the current repository name
@@ -28,7 +28,7 @@ You are helping the user view their intents.
    ## Open Intents
 
    ### 1. [Intent Title]
-   - **Folder:** {intents_folder}/open/YYYY-mm-dd-{repo}-{description}/
+   - **Folder:** {intents_folder}/in-progress/YYYY-mm-dd-{repo}-{description}/
    - **Started:** YYYY-MM-DD
    - **Status:** In Progress
    - **Requirements:** X/Y completed
@@ -47,7 +47,7 @@ You are helping the user view their intents.
 - **Repository filtering:** Only show intents that match the current repository name
 - To get the current repository name, run: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
 - Intent folder naming format: `YYYY-mm-dd-{repository-name}-{intent-description}`
-- Search for open intents in `~/.claude-intents/open/`
+- Search for open intents in `~/.claude-intents/in-progress/`
 - Search for done intents in `~/.claude-intents/done/`
 - Count checkboxes in spec.md to show progress (e.g., "3/5 requirements completed")
 - Sort by date (newest first)

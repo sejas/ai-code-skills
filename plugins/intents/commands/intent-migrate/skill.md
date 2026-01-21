@@ -19,7 +19,7 @@ You are helping the user migrate existing intents from the local `.sejas/` folde
 
 3. Target intents folder is `~/.claude-intents/`
 
-4. List intents to migrate from both `.sejas/open/` and `.sejas/done/`:
+4. List intents to migrate from both `.sejas/open/` (or `.sejas/in-progress/`) and `.sejas/done/`:
    - Show the user what will be migrated
    - Display old path → new path for each intent
 
@@ -31,8 +31,8 @@ You are helping the user migrate existing intents from the local `.sejas/` folde
 6. Ask user for confirmation before proceeding
 
 7. Perform the migration:
-   - Create `~/.claude-intents/open/` and `~/.claude-intents/done/` if they don't exist
-   - Move each intent folder from `.sejas/open/` to `~/.claude-intents/open/` with new name
+   - Create `~/.claude-intents/in-progress/` and `~/.claude-intents/done/` if they don't exist
+   - Move each intent folder from `.sejas/open/` (or `.sejas/in-progress/`) to `~/.claude-intents/in-progress/` with new name
    - Move each intent folder from `.sejas/done/` to `~/.claude-intents/done/` with new name
    - Use `mv` command to move folders
 
