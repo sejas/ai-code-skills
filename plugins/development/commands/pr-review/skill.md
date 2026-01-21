@@ -75,7 +75,15 @@ You are helping the user review pull requests assigned to them. This skill lists
     - **Best Practices**: Error handling, security, performance
     - **Consistency**: Follows project conventions and patterns
 
-12. Generate `pr-review.md` in the current directory with the structured review
+12. Generate the review file:
+    - Create directory if needed: `mkdir -p ~/.claude-intents/reviews`
+    - Generate filename using format: `YYYY-MM-DD-{repo}-{PR-ID}-{branch-name}--{description}.md`
+      - `{repo}`: Repository name (e.g., `my-project`)
+      - `{PR-ID}`: PR number (e.g., `123`)
+      - `{branch-name}`: Head branch name, sanitized (replace `/` with `-`)
+      - `{description}`: PR title, lowercase, spaces to hyphens, max 50 chars, alphanumeric only
+    - Example: `2026-01-20-calypso-12345-fix-login-bug--fix-authentication-crash.md`
+    - Save to: `~/.claude-intents/reviews/{filename}`
 
 ## PR Review Document Template
 
@@ -179,6 +187,28 @@ You are helping the user review pull requests assigned to them. This skill lists
 - Are there obvious performance concerns?
 - Does it follow the project's established patterns?
 
+## File Naming Convention
+
+Reviews are saved to `~/.claude-intents/reviews/` with this format:
+
+```
+YYYY-MM-DD-{repo}-{PR-ID}-{branch-name}--{description}.md
+```
+
+**Components:**
+- `YYYY-MM-DD`: Today's date
+- `{repo}`: Repository name (from `nameWithOwner`, take part after `/`)
+- `{PR-ID}`: PR number
+- `{branch-name}`: Head branch, with `/` replaced by `-`
+- `{description}`: PR title sanitized (lowercase, spaces→hyphens, alphanumeric, max 50 chars)
+
+**Examples:**
+```
+2026-01-20-calypso-245-fix-memory-leak--fix-memory-leak-in-cache.md
+2026-01-20-jetpack-1234-feature-dark-mode--add-dark-mode-toggle.md
+2026-01-20-woocommerce-567-bugfix-checkout--prevent-crash-on-null-user.md
+```
+
 ## Example Usage
 
 ```
@@ -194,7 +224,8 @@ PRs awaiting your review:
 Which PR would you like to review?
 
 User: [Selects PR #245]
-Assistant: [Checks out branch, runs linter, reads files, generates pr-review.md]
+Assistant: [Checks out branch, runs linter, reads files, generates review]
 
-✅ Review complete! Generated `pr-review.md` with findings.
+✅ Review complete! Saved to:
+   ~/.claude-intents/reviews/2026-01-20-my-repo-245-fix-memory-leak--fix-memory-leak-in-cache.md
 ```
