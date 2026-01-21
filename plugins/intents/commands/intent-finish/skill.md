@@ -10,8 +10,7 @@ You are helping the user mark an intent as complete.
 
 ## Workflow
 
-1. Check `{CLAUDE_INTENTS_FOLDER}/open/` for intents filtered by current repository:
-   - Get base path: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+1. Check `~/.claude-intents/open/` for intents filtered by current repository:
    - Get current repository name: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
    - List only intents where the folder name contains the current repository name
    - Intent folder format: `YYYY-mm-dd-{repository-name}-{intent-description}`
@@ -36,7 +35,7 @@ You are helping the user mark an intent as complete.
    - Add completion date
    - Add PR link (if provided)
    - Add "## Completion Summary" section with final notes
-9. Move the entire intent folder from `{CLAUDE_INTENTS_FOLDER}/open/` to `{CLAUDE_INTENTS_FOLDER}/done/`
+9. Move the entire intent folder from `~/.claude-intents/open/` to `~/.claude-intents/done/`
 10. Confirm the intent has been marked as complete and show the summary.md content
 
 ## Example spec.md update
@@ -94,13 +93,12 @@ index abc123..def456 100644
 
 ## Important Notes
 
-- **CLAUDE_INTENTS_FOLDER:** Use the `CLAUDE_INTENTS_FOLDER` environment variable for the base path. Default is `~/.claude-intents` if not set.
-- To get base path, run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+- **Intents folder:** All intents are stored in `~/.claude-intents/`
 - **Repository filtering:** Only show intents that match the current repository name. Get repository name with: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
 - Intent folder naming format: `YYYY-mm-dd-{repository-name}-{intent-description}`
-- Search for intents in `{CLAUDE_INTENTS_FOLDER}/open/`
-- Move completed intents to `{CLAUDE_INTENTS_FOLDER}/done/`
-- Create `{CLAUDE_INTENTS_FOLDER}/done/` directory if it doesn't exist
+- Search for intents in `~/.claude-intents/open/`
+- Move completed intents to `~/.claude-intents/done/`
+- Create `~/.claude-intents/done/` directory if it doesn't exist
 - Preserve all files when moving (spec.md, notes.md, summary.md, fix.diff)
 - Show before/after path for confirmation
 - The summary.md should be an extra short, concise summary - not a copy of the full spec

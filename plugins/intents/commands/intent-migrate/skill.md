@@ -17,8 +17,7 @@ You are helping the user migrate existing intents from the local `.sejas/` folde
 2. Check if `.sejas/` folder exists at the git root:
    - If not found, inform user: "No local .sejas/ folder found. Nothing to migrate."
 
-3. Get the target intents folder:
-   - Run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+3. Target intents folder is `~/.claude-intents/`
 
 4. List intents to migrate from both `.sejas/open/` and `.sejas/done/`:
    - Show the user what will be migrated
@@ -32,9 +31,9 @@ You are helping the user migrate existing intents from the local `.sejas/` folde
 6. Ask user for confirmation before proceeding
 
 7. Perform the migration:
-   - Create `{CLAUDE_INTENTS_FOLDER}/open/` and `{CLAUDE_INTENTS_FOLDER}/done/` if they don't exist
-   - Move each intent folder from `.sejas/open/` to `{CLAUDE_INTENTS_FOLDER}/open/` with new name
-   - Move each intent folder from `.sejas/done/` to `{CLAUDE_INTENTS_FOLDER}/done/` with new name
+   - Create `~/.claude-intents/open/` and `~/.claude-intents/done/` if they don't exist
+   - Move each intent folder from `.sejas/open/` to `~/.claude-intents/open/` with new name
+   - Move each intent folder from `.sejas/done/` to `~/.claude-intents/done/` with new name
    - Use `mv` command to move folders
 
 8. After successful migration:
@@ -69,7 +68,7 @@ Proceed with migration? (y/n)
 
 ## Important Notes
 
-- **CLAUDE_INTENTS_FOLDER:** Use the environment variable for target path. Default is `~/.claude-intents`
+- **Intents folder:** All intents are stored in `~/.claude-intents/`
 - **Preserve all files:** Move entire folder contents (spec.md, notes.md, pr.md, and any other files)
 - **No overwrites:** If a target folder already exists, warn the user and skip that intent
 - **Repository name:** Extracted from git or current folder name

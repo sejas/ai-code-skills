@@ -10,8 +10,7 @@ You are helping the user view their intents.
 
 ## Workflow
 
-1. Determine the intents folder path:
-   - Run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+1. Intents folder is `~/.claude-intents/`
 2. Get current repository name for filtering:
    - Run: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
 3. Check if `{intents_folder}/open/` exists
@@ -44,13 +43,12 @@ You are helping the user view their intents.
 
 ## Important Notes
 
-- **Intents folder:** Use the `CLAUDE_INTENTS_FOLDER` environment variable if set, otherwise default to `~/.claude-intents`
-- To get the intents folder, run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+- **Intents folder:** All intents are stored in `~/.claude-intents/`
 - **Repository filtering:** Only show intents that match the current repository name
 - To get the current repository name, run: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
 - Intent folder naming format: `YYYY-mm-dd-{repository-name}-{intent-description}`
-- Search for open intents in `{intents_folder}/open/`
-- Search for done intents in `{intents_folder}/done/`
+- Search for open intents in `~/.claude-intents/open/`
+- Search for done intents in `~/.claude-intents/done/`
 - Count checkboxes in spec.md to show progress (e.g., "3/5 requirements completed")
 - Sort by date (newest first)
 - Make the output scannable and concise

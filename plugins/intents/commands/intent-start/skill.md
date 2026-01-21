@@ -29,11 +29,10 @@ You are helping the user start a new intent using spec-driven development.
 
 5. Create the folder structure:
    ```
-   {CLAUDE_INTENTS_FOLDER}/open/YYYY-MM-DD-{repository-name}-{intent-description}/
+   ~/.claude-intents/open/YYYY-MM-DD-{repository-name}-{intent-description}/
    ├── spec.md
    └── notes.md
    ```
-   - Get base path from: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
 
 6. Write **spec.md** with this structure:
    ```markdown
@@ -117,14 +116,13 @@ You are helping the user start a new intent using spec-driven development.
 
 ## Important Notes
 
-- **Base path:** Use the `CLAUDE_INTENTS_FOLDER` environment variable. If not set, default to `~/.claude-intents`
-- To get base path, run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+- **Intents folder:** All intents are stored in `~/.claude-intents/`
 - **Repository name:** Get from git using: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
 - If not in a git repo, use the current folder name as repository name
 - Use today's date for folder name
 - Keep folder name lowercase with hyphens
-- Create `{CLAUDE_INTENTS_FOLDER}/open/` directory if it doesn't exist
-- Since intents are stored outside the repo (in `~/.claude-intents` by default), no gitignore changes are needed unless using a custom `CLAUDE_INTENTS_FOLDER` inside a repo
+- Create `~/.claude-intents/open/` directory if it doesn't exist
+- Since intents are stored outside the repo (in `~/.claude-intents`), no gitignore changes are needed
 
 ## Code Context Guidelines
 
