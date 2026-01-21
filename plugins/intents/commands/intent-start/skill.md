@@ -31,8 +31,7 @@ You are helping the user start a new intent using spec-driven development.
    ```
    {CLAUDE_INTENTS_FOLDER}/open/YYYY-MM-DD-{repository-name}-{intent-description}/
    ├── spec.md
-   ├── notes.md
-   └── assets/
+   └── notes.md
    ```
    - Get base path from: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
 
