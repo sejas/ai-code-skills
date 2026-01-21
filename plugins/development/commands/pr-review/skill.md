@@ -76,14 +76,20 @@ You are helping the user review pull requests assigned to them. This skill lists
     - **Consistency**: Follows project conventions and patterns
 
 12. Generate the review file:
-    - Create directory if needed: `mkdir -p ~/.claude-intents/reviews`
+    - Get base path: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+    - Create directory if needed: `mkdir -p {base_path}/reviews/in-progress`
     - Generate filename using format: `YYYY-MM-DD-{repo}-{PR-ID}-{branch-name}--{description}.md`
       - `{repo}`: Repository name (e.g., `my-project`)
       - `{PR-ID}`: PR number (e.g., `123`)
       - `{branch-name}`: Head branch name, sanitized (replace `/` with `-`)
       - `{description}`: PR title, lowercase, spaces to hyphens, max 50 chars, alphanumeric only
     - Example: `2026-01-20-calypso-12345-fix-login-bug--fix-authentication-crash.md`
-    - Save to: `~/.claude-intents/reviews/{filename}`
+    - Save to: `{base_path}/reviews/in-progress/{filename}`
+
+13. After generating the review, ask the user:
+    - "Would you like to mark this review as done?"
+    - If yes: move the file from `in-progress/` to `done/` (create `done/` if needed)
+    - If no: leave in `in-progress/` for later completion
 
 ## PR Review Document Template
 
@@ -156,6 +162,14 @@ You are helping the user review pull requests assigned to them. This skill lists
 <Final thoughts and next steps>
 ```
 
+## Important Notes
+
+- **CLAUDE_INTENTS_FOLDER:** Use the environment variable for base path. Default is `~/.claude-intents`
+- To get base path, run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+- Reviews start in `{base_path}/reviews/in-progress/`
+- Completed reviews are moved to `{base_path}/reviews/done/`
+- Create directories if they don't exist
+
 ## Important Rules
 
 - **DO NOT** post the review to GitHub automatically - just generate the local file
@@ -189,10 +203,17 @@ You are helping the user review pull requests assigned to them. This skill lists
 
 ## File Naming Convention
 
-Reviews are saved to `~/.claude-intents/reviews/` with this format:
+Reviews are saved to `{CLAUDE_INTENTS_FOLDER}/reviews/in-progress/` (default: `~/.claude-intents/reviews/in-progress/`) with this format:
 
 ```
 YYYY-MM-DD-{repo}-{PR-ID}-{branch-name}--{description}.md
+```
+
+**Folder Structure:**
+```
+{CLAUDE_INTENTS_FOLDER}/reviews/
+├── in-progress/    # Reviews currently being worked on
+└── done/           # Completed reviews
 ```
 
 **Components:**
@@ -227,5 +248,13 @@ User: [Selects PR #245]
 Assistant: [Checks out branch, runs linter, reads files, generates review]
 
 ✅ Review complete! Saved to:
-   ~/.claude-intents/reviews/2026-01-20-my-repo-245-fix-memory-leak--fix-memory-leak-in-cache.md
+   ~/.claude-intents/reviews/in-progress/2026-01-20-my-repo-245-fix-memory-leak--fix-memory-leak-in-cache.md
+
+Would you like to mark this review as done?
+
+User: Yes
+Assistant: [Moves file to done folder]
+
+✅ Review moved to:
+   ~/.claude-intents/reviews/done/2026-01-20-my-repo-245-fix-memory-leak--fix-memory-leak-in-cache.md
 ```
