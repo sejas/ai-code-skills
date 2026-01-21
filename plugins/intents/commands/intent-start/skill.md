@@ -11,7 +11,9 @@ You are helping the user start a new intent using spec-driven development.
 ## Workflow
 
 1. Ask the user: "What are you working on?" (brief description)
-2. Based on their answer, suggest a folder name in format: `YYYY-MM-DD-description` (use today's date)
+2. Based on their answer, suggest a folder name in format: `YYYY-MM-DD-{repository-name}-{intent-description}` (use today's date)
+   - Get repository name from: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
+   - Format example: `2026-01-20-ai-code-skills-add-dark-mode`
 3. Ask these questions to build the spec:
    - "What problem does this solve?"
    - "What's the proposed solution?"
@@ -27,11 +29,12 @@ You are helping the user start a new intent using spec-driven development.
 
 5. Create the folder structure:
    ```
-   .sejas/open/YYYY-MM-DD-description/
+   {CLAUDE_INTENTS_FOLDER}/open/YYYY-MM-DD-{repository-name}-{intent-description}/
    ├── spec.md
    ├── notes.md
    └── assets/
    ```
+   - Get base path from: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
 
 6. Write **spec.md** with this structure:
    ```markdown
@@ -115,13 +118,14 @@ You are helping the user start a new intent using spec-driven development.
 
 ## Important Notes
 
-- **Base path priority:** Use the git repository root (where `.git` lives) as the base path for `.sejas/`. If not in a git repo, use the current working directory.
-- To find git root, run: `git rev-parse --show-toplevel 2>/dev/null || pwd`
-- The `.sejas/` folder should be a sibling of `.git/` (e.g., `/path/to/repo/.sejas/`)
+- **Base path:** Use the `CLAUDE_INTENTS_FOLDER` environment variable. If not set, default to `~/.claude-intents`
+- To get base path, run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+- **Repository name:** Get from git using: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
+- If not in a git repo, use the current folder name as repository name
 - Use today's date for folder name
 - Keep folder name lowercase with hyphens
-- Create .sejas/open/ directory if it doesn't exist
-- Add .sejas to .gitignore (both global ~/.gitignore_global and local if in a repo)
+- Create `{CLAUDE_INTENTS_FOLDER}/open/` directory if it doesn't exist
+- Since intents are stored outside the repo (in `~/.claude-intents` by default), no gitignore changes are needed unless using a custom `CLAUDE_INTENTS_FOLDER` inside a repo
 
 ## Code Context Guidelines
 

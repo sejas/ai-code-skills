@@ -10,7 +10,11 @@ You are helping the user mark an intent as complete.
 
 ## Workflow
 
-1. Check `.sejas/open/` for intents - list them if multiple exist
+1. Check `{CLAUDE_INTENTS_FOLDER}/open/` for intents filtered by current repository:
+   - Get base path: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+   - Get current repository name: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
+   - List only intents where the folder name contains the current repository name
+   - Intent folder format: `YYYY-mm-dd-{repository-name}-{intent-description}`
 2. Ask which intent to mark as done (if multiple) or confirm the intent
 3. Read the spec.md to understand the intent
 4. Generate a **pr.md** file with PR description:
@@ -26,7 +30,7 @@ You are helping the user mark an intent as complete.
    - Add completion date
    - Add PR link (if provided)
    - Add "## Completion Summary" section with final notes
-8. Move the entire intent folder from `.sejas/open/` to `.sejas/done/`
+8. Move the entire intent folder from `{CLAUDE_INTENTS_FOLDER}/open/` to `{CLAUDE_INTENTS_FOLDER}/done/`
 9. Confirm the intent has been marked as complete and show the pr.md content
 
 ## Example spec.md update
@@ -63,12 +67,13 @@ You are helping the user mark an intent as complete.
 
 ## Important Notes
 
-- **Base path priority:** Use the git repository root (where `.git` lives) as the base path for `.sejas/`. If not in a git repo, use the current working directory.
-- To find git root, run: `git rev-parse --show-toplevel 2>/dev/null || pwd`
-- The `.sejas/` folder should be a sibling of `.git/` (e.g., `/path/to/repo/.sejas/`)
-- Search for intents in `<base>/.sejas/open/`
-- Move completed intents to `<base>/.sejas/done/`
-- Create .sejas/done/ directory if it doesn't exist
+- **CLAUDE_INTENTS_FOLDER:** Use the `CLAUDE_INTENTS_FOLDER` environment variable for the base path. Default is `~/.claude-intents` if not set.
+- To get base path, run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+- **Repository filtering:** Only show intents that match the current repository name. Get repository name with: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
+- Intent folder naming format: `YYYY-mm-dd-{repository-name}-{intent-description}`
+- Search for intents in `{CLAUDE_INTENTS_FOLDER}/open/`
+- Move completed intents to `{CLAUDE_INTENTS_FOLDER}/done/`
+- Create `{CLAUDE_INTENTS_FOLDER}/done/` directory if it doesn't exist
 - Preserve all files when moving (spec.md, notes.md, pr.md, assets/)
 - Show before/after path for confirmation
 - The pr.md should be an extra short, concise summary - not a copy of the full spec

@@ -10,19 +10,26 @@ You are helping the user view their intents.
 
 ## Workflow
 
-1. Check if `.sejas/open/` exists
-2. List all folders in `.sejas/open/`
-3. For each intent folder:
+1. Determine the intents folder path:
+   - Run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+2. Get current repository name for filtering:
+   - Run: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
+3. Check if `{intents_folder}/open/` exists
+4. List all folders in `{intents_folder}/open/`
+5. Filter intents by current repository:
+   - Intent folder format: `YYYY-mm-dd-{repository-name}-{intent-description}`
+   - Only show intents where the folder name contains the current repository name
+6. For each matching intent folder:
    - Read the spec.md file
    - Extract: title, date started, and status
    - Show a summary
 
-4. Display in this format:
+7. Display in this format:
    ```
    ## Open Intents
 
    ### 1. [Intent Title]
-   - **Folder:** .sejas/open/YYYY-MM-DD-description/
+   - **Folder:** {intents_folder}/open/YYYY-mm-dd-{repo}-{description}/
    - **Started:** YYYY-MM-DD
    - **Status:** In Progress
    - **Requirements:** X/Y completed
@@ -31,17 +38,19 @@ You are helping the user view their intents.
    ...
    ```
 
-5. If no open intents exist, say: "No open intents found. Use `/intent-start` to begin a new intent."
+8. If no open intents exist for the current repository, say: "No open intents found for this repository. Use `/intent-start` to begin a new intent."
 
-6. Optionally, offer to show done intents if the user wants to see them
+9. Optionally, offer to show done intents if the user wants to see them
 
 ## Important Notes
 
-- **Base path priority:** Use the git repository root (where `.git` lives) as the base path for `.sejas/`. If not in a git repo, use the current working directory.
-- To find git root, run: `git rev-parse --show-toplevel 2>/dev/null || pwd`
-- The `.sejas/` folder should be a sibling of `.git/` (e.g., `/path/to/repo/.sejas/`)
-- Search for open intents in `<base>/.sejas/open/`
-- Search for done intents in `<base>/.sejas/done/`
+- **Intents folder:** Use the `CLAUDE_INTENTS_FOLDER` environment variable if set, otherwise default to `~/.claude-intents`
+- To get the intents folder, run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
+- **Repository filtering:** Only show intents that match the current repository name
+- To get the current repository name, run: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
+- Intent folder naming format: `YYYY-mm-dd-{repository-name}-{intent-description}`
+- Search for open intents in `{intents_folder}/open/`
+- Search for done intents in `{intents_folder}/done/`
 - Count checkboxes in spec.md to show progress (e.g., "3/5 requirements completed")
 - Sort by date (newest first)
 - Make the output scannable and concise
