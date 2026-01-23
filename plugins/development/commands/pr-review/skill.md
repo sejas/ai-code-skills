@@ -8,6 +8,14 @@ user-invocable: true
 
 You are helping the user review pull requests assigned to them. This skill lists PRs awaiting review, prioritizes unreviewed ones, and generates structured review documents.
 
+## Configuration
+
+- **Worktree directory:** `~/.claude-worktrees/`
+- **Worktree naming:** `pr-review-{repo}-{PR}` (e.g., `pr-review-calypso-245`)
+- **Reviews folder:** `~/.claude-intents/reviews/`
+
+Worktrees allow reviewing PRs without affecting your current working directory or branch. Multiple reviews can run in parallel.
+
 ## Workflow
 
 ### Phase 1: List PRs Awaiting Review
@@ -38,36 +46,61 @@ You are helping the user review pull requests assigned to them. This skill lists
 
 5. Let user select a PR to review (or exit)
 
-### Phase 2: Checkout and Prepare
+### Phase 2: Create Worktree and Prepare
 
 6. Once user selects a PR, fetch full PR details:
    ```bash
    gh pr view <number> --json number,title,body,author,headRefName,baseRefName,files,additions,deletions,commits
    ```
 
-7. Checkout the PR branch:
+7. Create a git worktree for the PR:
    ```bash
-   gh pr checkout <number>
+   # Get repo name
+   REPO=$(basename $(gh repo view --json name --jq '.name'))
+   PR_NUM=<number>
+   WORKTREE_NAME="pr-review-${REPO}-${PR_NUM}"
+   WORKTREE_PATH="$HOME/.claude-worktrees/${WORKTREE_NAME}"
+
+   # Create worktrees directory if needed
+   mkdir -p ~/.claude-worktrees
+
+   # Fetch the PR branch
+   gh pr checkout <number> --detach
+   BRANCH=$(git rev-parse --abbrev-ref HEAD)
+   git checkout -  # Go back to original branch
+
+   # Check if worktree already exists
+   if git worktree list | grep -q "${WORKTREE_PATH}"; then
+     # Ask user: reuse existing or recreate?
+     # If recreate: git worktree remove "${WORKTREE_PATH}" --force
+   fi
+
+   # Create the worktree
+   git worktree add "${WORKTREE_PATH}" <headRefName>
    ```
 
-8. Detect and run the project linter:
+   - Store `WORKTREE_PATH` for use in subsequent steps
+   - All file operations will happen in this worktree directory
+
+8. Detect and run the project linter (in the worktree):
+   - **All commands run in `${WORKTREE_PATH}`** using `cd "${WORKTREE_PATH}" && <command>`
    - Check for common linter configs in order:
-     - `package.json` → look for `lint` script → run `npm run lint` or `yarn lint`
-     - `.eslintrc*` → run `npx eslint .`
-     - `pyproject.toml` with ruff/flake8 → run `ruff check .` or `flake8`
-     - `setup.cfg` or `.flake8` → run `flake8`
-     - `.rubocop.yml` → run `rubocop`
-     - `Makefile` with lint target → run `make lint`
+     - `package.json` → look for `lint` script → run `cd "${WORKTREE_PATH}" && npm run lint`
+     - `.eslintrc*` → run `cd "${WORKTREE_PATH}" && npx eslint .`
+     - `pyproject.toml` with ruff/flake8 → run `cd "${WORKTREE_PATH}" && ruff check .`
+     - `setup.cfg` or `.flake8` → run `cd "${WORKTREE_PATH}" && flake8`
+     - `.rubocop.yml` → run `cd "${WORKTREE_PATH}" && rubocop`
+     - `Makefile` with lint target → run `cd "${WORKTREE_PATH}" && make lint`
    - If no linter found, skip and note it in the review
 
 9. Capture linter output for inclusion in review
 
 ### Phase 3: Code Review
 
-10. Read the changed files:
+10. Read the changed files (from the worktree):
     - Use the files list from PR details
-    - Read each modified file to understand the changes
-    - Run `gh pr diff <number>` to see the actual diff
+    - Read each modified file from `${WORKTREE_PATH}/<file>` to understand the changes
+    - Run `gh pr diff <number>` to see the actual diff (can run from any directory)
 
 11. Analyze the code focusing on:
     - **Readability**: Clear naming, logical structure, appropriate comments
@@ -76,20 +109,27 @@ You are helping the user review pull requests assigned to them. This skill lists
     - **Consistency**: Follows project conventions and patterns
 
 12. Generate the review file:
-    - Get base path: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
-    - Create directory if needed: `mkdir -p {base_path}/reviews/in-progress`
+    - Create directory if needed: `mkdir -p ~/.claude-intents/reviews/in-progress`
     - Generate filename using format: `YYYY-MM-DD-{repo}-{PR-ID}-{branch-name}--{description}.md`
       - `{repo}`: Repository name (e.g., `my-project`)
       - `{PR-ID}`: PR number (e.g., `123`)
       - `{branch-name}`: Head branch name, sanitized (replace `/` with `-`)
       - `{description}`: PR title, lowercase, spaces to hyphens, max 50 chars, alphanumeric only
     - Example: `2026-01-20-calypso-12345-fix-login-bug--fix-authentication-crash.md`
-    - Save to: `{base_path}/reviews/in-progress/{filename}`
+    - Save to: `~/.claude-intents/reviews/in-progress/{filename}`
 
 13. After generating the review, ask the user:
     - "Would you like to mark this review as done?"
     - If yes: move the file from `in-progress/` to `done/` (create `done/` if needed)
     - If no: leave in `in-progress/` for later completion
+
+14. Clean up the git worktree:
+    ```bash
+    git worktree remove "${WORKTREE_PATH}" --force
+    ```
+    - **Always clean up** after the review is complete (whether marked done or not)
+    - This removes the worktree directory and unregisters it from git
+    - The user's original working directory remains unchanged
 
 ## PR Review Document Template
 
@@ -164,10 +204,21 @@ You are helping the user review pull requests assigned to them. This skill lists
 
 ## Important Notes
 
-- **CLAUDE_INTENTS_FOLDER:** Use the environment variable for base path. Default is `~/.claude-intents`
-- To get base path, run: `echo "${CLAUDE_INTENTS_FOLDER:-$HOME/.claude-intents}"`
-- Reviews start in `{base_path}/reviews/in-progress/`
-- Completed reviews are moved to `{base_path}/reviews/done/`
+### Worktrees
+- **Worktree directory:** `~/.claude-worktrees/`
+- **Naming convention:** `pr-review-{repo}-{PR}` (e.g., `pr-review-calypso-245`)
+- Worktrees are created to isolate PR review from the user's current work
+- **Always clean up worktrees** when review is complete (step 14)
+- If worktree creation fails or review is cancelled, clean up any partial worktree:
+  ```bash
+  git worktree remove "${WORKTREE_PATH}" --force 2>/dev/null || rm -rf "${WORKTREE_PATH}"
+  ```
+- To list existing worktrees: `git worktree list`
+
+### Reviews
+- **Reviews folder:** All reviews are stored in `~/.claude-intents/reviews/`
+- Reviews start in `~/.claude-intents/reviews/in-progress/`
+- Completed reviews are moved to `~/.claude-intents/reviews/done/`
 - Create directories if they don't exist
 
 ## Important Rules
@@ -203,15 +254,16 @@ You are helping the user review pull requests assigned to them. This skill lists
 
 ## File Naming Convention
 
-Reviews are saved to `{CLAUDE_INTENTS_FOLDER}/reviews/in-progress/` (default: `~/.claude-intents/reviews/in-progress/`) with this format:
+Reviews are saved to `~/.claude-intents/reviews/in-progress/` with this format:
 
-```
+```text
 YYYY-MM-DD-{repo}-{PR-ID}-{branch-name}--{description}.md
 ```
 
 **Folder Structure:**
-```
-{CLAUDE_INTENTS_FOLDER}/reviews/
+
+```text
+~/.claude-intents/reviews/
 ├── in-progress/    # Reviews currently being worked on
 └── done/           # Completed reviews
 ```
@@ -245,7 +297,12 @@ PRs awaiting your review:
 Which PR would you like to review?
 
 User: [Selects PR #245]
-Assistant: [Checks out branch, runs linter, reads files, generates review]
+Assistant: [Creates worktree at ~/.claude-worktrees/pr-review-my-repo-245]
+
+Creating worktree for PR #245...
+✅ Worktree created at: ~/.claude-worktrees/pr-review-my-repo-245
+
+[Runs linter in worktree, reads files, generates review]
 
 ✅ Review complete! Saved to:
    ~/.claude-intents/reviews/in-progress/2026-01-20-my-repo-245-fix-memory-leak--fix-memory-leak-in-cache.md
@@ -253,8 +310,28 @@ Assistant: [Checks out branch, runs linter, reads files, generates review]
 Would you like to mark this review as done?
 
 User: Yes
-Assistant: [Moves file to done folder]
+Assistant: [Moves file to done folder, cleans up worktree]
 
 ✅ Review moved to:
    ~/.claude-intents/reviews/done/2026-01-20-my-repo-245-fix-memory-leak--fix-memory-leak-in-cache.md
+✅ Worktree cleaned up
+```
+
+### Worktree Conflict Example
+
+```
+User: [Selects PR #245]
+Assistant: [Detects existing worktree]
+
+⚠️ A worktree already exists for this PR at:
+   ~/.claude-worktrees/pr-review-my-repo-245
+
+Would you like to:
+1. Reuse existing worktree
+2. Delete and recreate worktree
+
+User: [Selects option 2]
+Assistant: [Removes old worktree, creates fresh one]
+
+✅ Worktree recreated at: ~/.claude-worktrees/pr-review-my-repo-245
 ```
