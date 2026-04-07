@@ -1,6 +1,7 @@
 ---
 name: context-window-statusline
 description: This skill should be used when the user asks to "set up a status line", "configure the footer", "show context window usage", "add a statusline", "visualize context window", "customize the Claude Code footer", or wants to display token counts, cost, or session metrics in the Claude Code terminal footer.
+user-invocable: true
 ---
 
 # Context Window Status Line

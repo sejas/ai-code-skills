@@ -43,7 +43,7 @@ You are helping the user understand source code functions in the codebase by fin
    - Highlight key parts with background colors and emphasis
    - Mark "tricky parts" with special visual indicators (badges/alerts)
    - Include an interactive table of contents
-   - Save the file as `{function_name}_explanation.html` in the project root
+   - Save the file as `{function_name}_explanation.html` in `~/claude.nosync/questions/`
    - Open the file in the user's default browser
 
 ## Key Principles
@@ -77,8 +77,8 @@ The HTML file generated will include:
 4. **How It Works** - Step-by-step breakdown
 5. **Parameters & Returns** - Documented input/output
 6. **Key Concepts** - Explains important parts with highlights
-7. **Tricky Parts** - Edge cases and gotchas marked clearly
+7. **⚠️ Tricky Parts** - Edge cases and gotchas marked clearly
 8. **Common Usage** - Examples of how it's used
 9. **Related Functions** - Links to connected code
 
-The file is saved as `{function_name}_explanation.html` and automatically opened in your browser.
+The file is saved as `~/claude.nosync/questions/{function_name}_explanation.html` and automatically opened in your browser.

@@ -2,6 +2,7 @@
 name: pr-review
 description: List PRs awaiting your review, checkout the branch, run linter, and generate a structured code review document.
 user-invocable: true
+allowed-tools: ["Bash", "Read", "Write", "Glob", "Grep", "AskUserQuestion"]
 ---
 
 # PR Review

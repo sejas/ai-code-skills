@@ -1,12 +1,12 @@
 ---
 name: blog-post
-description: This skill should be used when the user asks to "write a blog post", "draft a blog post", "create a blog post", "write an article about", or wants to produce a markdown blog post on any topic. Outputs to ~/claude-posts/.
+description: This skill should be used when the user asks to "write a blog post", "draft a blog post", "create a blog post", "write an article about", or wants to produce a markdown blog post on any topic. Outputs to ~/claude.nosync/posts/.
 user-invocable: true
 ---
 
 # Blog Post Drafter
 
-Draft a well-structured blog post in markdown and save it to `~/claude-posts/`.
+Draft a well-structured blog post in markdown and save it to `~/claude.nosync/posts/`.
 
 ## Workflow
 
@@ -22,7 +22,7 @@ Default to: developer audience, professional-but-approachable tone, medium lengt
 
 ### 2. Create Output Directory
 
-Run `mkdir -p ~/claude-posts` to ensure the output directory exists.
+Run `mkdir -p ~/claude.nosync/posts` to ensure the output directory exists.
 
 ### 3. Generate the Slug
 
@@ -74,7 +74,7 @@ Summarize key takeaways. End with a call to action or thought-provoking question
 
 ### 5. Save the File
 
-Write the completed post to `~/claude-posts/YYYY-MM-DD-slug.md`.
+Write the completed post to `~/claude.nosync/posts/YYYY-MM-DD-slug.md`.
 
 ### 6. Present Summary
 

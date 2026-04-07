@@ -137,7 +137,7 @@ raw_output=$(studio wp plugin list --status=active --fields=name --format=json 2
 json=$(echo "$raw_output" | grep -oE '\[.*\]' | head -1)
 
 if [[ -z "$json" ]]; then
-  echo "Failed to parse plugin list. Raw output:"
+  echo "❌ Failed to parse plugin list. Raw output:"
   echo "$raw_output"
   exit 1
 fi
@@ -154,7 +154,7 @@ for p in data:
 ")
 
 if [[ ${#plugins[@]} -eq 0 ]]; then
-  echo "No active plugins found."
+  echo "❌ No active plugins found."
   exit 1
 fi
 
@@ -169,24 +169,24 @@ for plugin in "${plugins[@]}"; do
   echo "Testing: $plugin"
   echo "=========================================="
 
-  echo "Deactivating $plugin..."
+  echo "⏸  Deactivating $plugin..."
   if ! studio wp plugin deactivate "$plugin" 2>/dev/null; then
-    echo "Failed to deactivate $plugin, skipping."
+    echo "⚠️  Failed to deactivate $plugin, skipping."
     continue
   fi
 
-  echo "Starting site..."
+  echo "🚀 Starting site..."
   if studio site start 2>/dev/null; then
     echo ""
-    echo "Conflicting plugin found: $plugin"
+    echo "🎯 Conflicting plugin found: $plugin"
     conflicting+=("$plugin")
-    echo "Stopping site..."
+    echo "🛑 Stopping site..."
     studio site stop 2>/dev/null || true
   else
-    echo "Site still fails without $plugin."
+    echo "❌ Site still fails without $plugin."
   fi
 
-  echo "Reactivating $plugin..."
+  echo "🔄 Reactivating $plugin..."
   studio wp plugin activate "$plugin" 2>/dev/null || true
   echo ""
 done
@@ -196,12 +196,12 @@ echo "RESULTS"
 echo "=========================================="
 
 if [[ ${#conflicting[@]} -gt 0 ]]; then
-  echo "Conflicting plugins found (${#conflicting[@]}):"
+  echo "🎯 Conflicting plugins found (${#conflicting[@]}):"
   for p in "${conflicting[@]}"; do
-    echo "  $p"
+    echo "  ❌ $p"
   done
 else
-  echo "No single conflicting plugin found."
+  echo "✅ No single conflicting plugin found."
   echo "   The issue may involve multiple plugins interacting."
 fi
 ```

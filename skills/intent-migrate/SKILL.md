@@ -22,12 +22,12 @@ You are helping the user migrate existing intents from the local `.sejas/` folde
 
 4. List intents to migrate from both `.sejas/in-progress/` and `.sejas/done/`:
    - Show the user what will be migrated
-   - Display old path -> new path for each intent
+   - Display old path → new path for each intent
 
 5. For each intent folder, transform the name:
    - **Old format:** `YYYY-MM-DD-description`
    - **New format:** `YYYY-MM-DD-{repository-name}-{description}`
-   - Example: `2026-01-15-add-feature` -> `2026-01-15-my-repo-add-feature`
+   - Example: `2026-01-15-add-feature` → `2026-01-15-my-repo-add-feature`
 
 6. Ask user for confirmation before proceeding
 
@@ -57,12 +57,12 @@ You are helping the user migrate existing intents from the local `.sejas/` folde
 **Repository:** my-repo
 
 ### Open Intents (3)
-- 2026-01-15-add-feature -> 2026-01-15-my-repo-add-feature
-- 2026-01-18-fix-bug -> 2026-01-18-my-repo-fix-bug
-- 2026-01-20-update-docs -> 2026-01-20-my-repo-update-docs
+- 2026-01-15-add-feature → 2026-01-15-my-repo-add-feature
+- 2026-01-18-fix-bug → 2026-01-18-my-repo-fix-bug
+- 2026-01-20-update-docs → 2026-01-20-my-repo-update-docs
 
 ### Done Intents (1)
-- 2026-01-10-initial-setup -> 2026-01-10-my-repo-initial-setup
+- 2026-01-10-initial-setup → 2026-01-10-my-repo-initial-setup
 
 Proceed with migration? (y/n)
 ```

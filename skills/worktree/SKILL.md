@@ -1,12 +1,12 @@
 ---
 name: worktree
-description: Create a new git worktree from origin/trunk in ~/worktrees and copy node_modules. Use when the user wants to "create a worktree", "new worktree", "start a worktree branch", or needs an isolated working directory for a feature branch.
+description: Create a new git worktree from origin/trunk in ~/worktrees.nosync and copy node_modules. Use when the user wants to "create a worktree", "new worktree", "start a worktree branch", or needs an isolated working directory for a feature branch.
 user-invocable: true
 ---
 
 # Worktree
 
-Create a new git worktree based on origin/trunk in ~/worktrees, with node_modules copied from the current directory for fast setup.
+Create a new git worktree based on origin/trunk in ~/worktrees.nosync, with node_modules copied from the current directory for fast setup.
 
 ## Workflow
 
@@ -22,23 +22,23 @@ Create a new git worktree based on origin/trunk in ~/worktrees, with node_module
 
 3. Create the worktree directory if needed:
    ```bash
-   mkdir -p ~/worktrees
+   mkdir -p ~/worktrees.nosync
    ```
 
 4. Create the worktree with new branch:
    ```bash
-   git worktree add ~/worktrees/<branch-name> -b <branch-name> origin/trunk
+   git worktree add ~/worktrees.nosync/<branch-name> -b <branch-name> origin/trunk
    ```
 
 5. Copy node_modules if it exists in the source directory:
    ```bash
-   cp -R ./node_modules ~/worktrees/<branch-name>/node_modules
+   cp -R ./node_modules ~/worktrees.nosync/<branch-name>/node_modules
    ```
    Note: This can take a moment for large node_modules directories.
 
 6. Report success with the path to the new worktree:
    ```
-   Worktree created at: ~/worktrees/<branch-name>
+   Worktree created at: ~/worktrees.nosync/<branch-name>
    ```
 
 ## Important Rules
@@ -60,5 +60,5 @@ If the user doesn't specify a branch name, suggest a format based on context:
 
 After completing work, remind the user they can remove the worktree with:
 ```bash
-git worktree remove ~/worktrees/<branch-name>
+git worktree remove ~/worktrees.nosync/<branch-name>
 ```

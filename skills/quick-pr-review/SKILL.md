@@ -4,24 +4,22 @@ description: >-
   This skill should be used when the user asks to "quick review a PR",
   "fast pr review", "review this PR without checkout", "review PR diff",
   or provides a GitHub PR URL for lightweight review. Reads PR description,
-  fetches Linear issue context, reviews the diff, and outputs an HTML review
-  file with copy-to-clipboard.
+  fetches Linear issue context, reviews the diff, and outputs a markdown review
+  file opened in Obsidian.
 user-invocable: true
 allowed-tools: ["Bash", "Read", "Write",
-  "mcp__claude_ai_Linear__get_issue",
-  "mcp__claude_ai_Linear__list_issues"]
+  "mcp__plugin_context-a8c_context-a8c__context-a8c-load-provider",
+  "mcp__plugin_context-a8c_context-a8c__context-a8c-execute-tool"]
 ---
 
 # Quick PR Review
 
-Lightweight, remote-only code review. No worktrees, no checkouts, no linting — fetch PR data via `gh`, review the diff, write markdown, open with browser preview.
+Lightweight, remote-only code review. No worktrees, no checkouts, no linting — fetch PR data via `gh`, review the diff, write markdown, open in Obsidian.
 
 ## Configuration
 
-- **Output folder:** `~/claude-reviews/`
+- **Output folder:** `~/claude.nosync/reviews/`
 - **Filename format:** `YYYY-MM-DD-{project}-{pr-number}-{linearid}-{pr-title}.md`
-- **Preview template:** `~/.claude/skills/quick-pr-review/assets/review-template.html`
-
 ## Workflow
 
 ### Step 1: Parse PR Input & Parallel Fetch
@@ -34,8 +32,7 @@ Once you have `OWNER/REPO` and `PR_NUMBER`, launch **all of these in parallel** 
 
 1. **Bash:** `gh pr view <PR_NUMBER> --repo <OWNER/REPO> --json title,body,author,baseRefName,headRefName,url,files,additions,deletions`
 2. **Bash:** `gh pr diff <PR_NUMBER> --repo <OWNER/REPO>`
-3. **Bash:** `mkdir -p ~/claude-reviews`
-4. **Read:** `~/.claude/skills/quick-pr-review/assets/review-template.html`
+3. **Bash:** `mkdir -p ~/claude.nosync/reviews`
 
 ### Step 2: Extract Linear ID & Fetch Issue
 
@@ -43,10 +40,9 @@ From PR metadata (now available), extract a Linear ID matching `[A-Z]{2,10}-\d+`
 1. The PR body
 2. The head branch name
 
-If found, fetch the issue using the **native Linear MCP tool** (single call, no provider loading needed):
-```
-mcp__claude_ai_Linear__get_issue(id: "<LINEAR_ID>")
-```
+If found, fetch the issue using the **context-a8c Linear provider**:
+1. Load provider: `mcp__plugin_context-a8c_context-a8c__context-a8c-load-provider` with `provider: "linear"`
+2. Execute tool to get issue details: `mcp__plugin_context-a8c_context-a8c__context-a8c-execute-tool` with the appropriate Linear search tool
 Store: `LINEAR_TITLE`, `LINEAR_URL`, `LINEAR_DESCRIPTION`.
 
 If no Linear ID found, skip.
@@ -117,15 +113,13 @@ Compose the review markdown:
 - Include `path/to/file:line` where possible.
 - Quality over quantity.
 
-### Step 4: Write Markdown & Open Preview
+### Step 4: Write Markdown & Open in Obsidian
 
-1. **Write** the review markdown to `~/claude-reviews/<filename>.md`
+1. **Write** the review markdown to `~/claude.nosync/reviews/<filename>.md`
 
-2. **Build preview HTML:** Read the template (already loaded from Step 1). Replace the single placeholder `{{REVIEW_MARKDOWN}}` with the review markdown (escaped: `&` -> `&amp;`, `<` -> `&lt;`, `>` -> `&gt;`). Write to `~/claude-reviews/<filename>.html`.
-
-3. **Open:**
+2. **Open in Obsidian** using the URI scheme so it navigates to the note:
 ```bash
-open ~/claude-reviews/<filename>.html
+open "obsidian://open?vault=sejas&file=claude.nosync%2Freviews%2F<filename>.md"
 ```
 
 Report the `.md` file path to the user.
@@ -134,7 +128,7 @@ Report the `.md` file path to the user.
 
 Format: `YYYY-MM-DD-{project}-{pr-number}-{linearid}-{pr-title}`
 
-Use `.md` for the markdown file, `.html` for the preview companion.
+Use `.md` extension.
 
 - `{project}`: repo name, lowercase
 - `{linearid}`: lowercase Linear ID. **Omit segment** if none found.

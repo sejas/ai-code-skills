@@ -17,7 +17,7 @@ You are helping the user start a new intent using spec-driven development.
    - **With Linear ID:** `YYYY-MM-DD-{repository-name}-{linear-id-lowercase}-{intent-description}`
    - **Without Linear ID:** `YYYY-MM-DD-{repository-name}-{intent-description}`
    - Get repository name from: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
-   - Linear ID should be converted to lowercase (e.g., `ABC-123` -> `abc-123`)
+   - Linear ID should be converted to lowercase (e.g., `ABC-123` → `abc-123`)
    - Format examples:
      - With Linear ID: `2026-01-20-ai-code-skills-abc-123-add-dark-mode`
      - Without Linear ID: `2026-01-20-ai-code-skills-add-dark-mode`
@@ -131,7 +131,7 @@ You are helping the user start a new intent using spec-driven development.
 - **Repository name:** Get from git using: `basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd)`
 - If not in a git repo, use the current folder name as repository name
 - **Linear ID (optional):** When provided, include lowercase Linear ID after repository name
-  - Convert to lowercase: `ABC-123` -> `abc-123`
+  - Convert to lowercase: `ABC-123` → `abc-123`
   - Include in spec.md with link: `**Linear Issue:** [ABC-123](https://linear.app/team/issue/ABC-123)`
   - Useful for branch naming: `git checkout -b abc-123-intent-description`
 - Use today's date for folder name
