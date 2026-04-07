@@ -84,7 +84,9 @@ for pdir in project_dirs:
                     key = (project, sid)
                     if key not in seen and branch:
                         seen.add(key)
-                        short = project.replace('-Users-macbookpro-Documents-projects-m3-nosync-', '').replace('-Users-macbookpro', '~')
+                        import os
+                        home_prefix = '-' + os.path.expanduser('~').replace('/', '-')
+                        short = project.replace(home_prefix + '-', '').replace(home_prefix, '~')
                         print(f'{short} | {branch} | {sid[:8]}')
                     break
         except:
@@ -270,7 +272,7 @@ If the user passes a date argument (e.g., `/today 2026-02-09`), use that date in
 
 - `history.jsonl` timestamps are epoch milliseconds — divide by 1000 for Python's `datetime.fromtimestamp()`
 - Session `.jsonl` files are named `<sessionId>.jsonl` — the sessionId in history.jsonl maps to these files
-- Project directory names encode the path with `-` replacing `/` (e.g., `-Users-macbookpro-Documents-projects-m3-nosync-studio`)
+- Project directory names encode the path with `-` replacing `/` (e.g., `-Users-<username>-Documents-projects-studio`)
 - Agent transcript files start with `agent-` prefix — skip these when scanning for sessions
 - The `stats-cache.json` `dailyActivity` array may not include today if it hasn't been recomputed yet — fall back to counting from history.jsonl
 - Always run the Python extraction scripts via Bash, do not try to read history.jsonl directly (it can be very large)

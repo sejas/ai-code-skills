@@ -10,7 +10,7 @@ Update the user's daily Obsidian diary with work activity from this session.
 
 ## Configuration
 
-- **Diary path:** `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/sejas/🗓️ Diary/`
+- **Diary path:** `$STANDUP_DIARY_PATH` (set this env var to your Obsidian diary folder, e.g. `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/<vault>/Diary/`)
 - **File format:** `YYYY-MM-DD.md`
 
 ## Workflow
@@ -81,7 +81,7 @@ Build sets to avoid showing same item in multiple sections:
 
 ### Step 5: Read/Create Daily File
 
-**File path:** `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/sejas/🗓️ Diary/YYYY-MM-DD.md`
+**File path:** `$STANDUP_DIARY_PATH/YYYY-MM-DD.md`
 
 If file doesn't exist, create with template:
 ```markdown
@@ -144,9 +144,9 @@ Show the user:
 ---
 **Claude Code Session (16:45)**
 - Created PRs:
-    - [Fix PHP wp-config warnings #2490](https://github.com/Automattic/studio/pull/2490)
+    - [Fix some bug #123](https://github.com/owner/repo/pull/123)
 - Reviewed:
-    - [Update tab selection logic #2468](https://github.com/Automattic/studio/pull/2468)
+    - [Update some logic #124](https://github.com/owner/repo/pull/124)
 - Issues worked on:
     - [STU-1234 - Backend refactor for site deletion](https://linear.app/...)
 - Issues created:

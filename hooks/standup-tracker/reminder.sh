@@ -4,7 +4,12 @@
 # Checks if today's diary has been updated with a Claude Code Session block.
 # If not, reminds the user to run /standup.
 
-DIARY_PATH="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/sejas/🗓️ Diary"
+# Set STANDUP_DIARY_PATH in your environment, e.g.:
+#   export STANDUP_DIARY_PATH="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/<vault>/Diary"
+DIARY_PATH="${STANDUP_DIARY_PATH:-}"
+if [[ -z "$DIARY_PATH" ]]; then
+    exit 0
+fi
 TODAY=$(date +%Y-%m-%d)
 DIARY_FILE="$DIARY_PATH/$TODAY.md"
 

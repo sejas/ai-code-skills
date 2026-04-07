@@ -119,7 +119,7 @@ Compose the review markdown:
 
 2. **Open in Obsidian** using the URI scheme so it navigates to the note:
 ```bash
-open "obsidian://open?vault=sejas&file=claude.nosync%2Freviews%2F<filename>.md"
+open "obsidian://open?vault=${OBSIDIAN_VAULT}&file=claude.nosync%2Freviews%2F<filename>.md"
 ```
 
 Report the `.md` file path to the user.

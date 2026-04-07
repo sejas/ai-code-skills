@@ -41,7 +41,7 @@ Things 3 supports the `things:///add` URL scheme with these parameters:
 Use the `scripts/encode.sh` script to properly URL-encode parameter values:
 
 ```bash
-source /Users/macbookpro/.claude/skills/todo/scripts/encode.sh
+source "$HOME/.claude/skills/todo/scripts/encode.sh"
 encoded=$(urlencode "My task title")
 ```
 

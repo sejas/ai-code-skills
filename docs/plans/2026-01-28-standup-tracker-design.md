@@ -96,7 +96,7 @@ Query Linear for issues created by user today via context-a8c MCP provider.
 ## File Path
 
 ```
-~/Library/Mobile Documents/iCloud~md~obsidian/Documents/sejas/🗓️ Diary/YYYY-MM-DD.md
+~/Library/Mobile Documents/iCloud~md~obsidian/Documents/<vault>/Diary/YYYY-MM-DD.md
 ```
 
 **Template for new files:**
@@ -132,7 +132,7 @@ plugins/standup-tracker/
   "name": "standup-tracker",
   "description": "Track daily work and update Obsidian diary",
   "settings": {
-    "STANDUP_DIARY_PATH": "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/sejas/🗓️ Diary"
+    "STANDUP_DIARY_PATH": "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/<vault>/Diary"
   }
 }
 ```
