@@ -50,6 +50,7 @@ for d in skills/*/; do ln -s "$PWD/$d" "$HOME/.claude/skills/$(basename $d)"; do
 - `blog-post` — Draft a markdown blog post
 - `question` — Answer a question and render as HTML
 - `presentation` — Generate Marp slides from an intent spec
+- `og-inspect` — Inspect a URL's OG / Twitter Card metadata and render a multi-platform share-card preview
 
 ### Tools / UI
 - `context-window-statusline` — Status line showing context window usage
