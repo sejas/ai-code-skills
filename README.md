@@ -83,7 +83,7 @@ Lightweight ticketing inside `~/claude.nosync/intents/`. Each intent is a markdo
 
 Standalone bash hook scripts, opt-in. Wire them into `~/.claude/settings.json` under the relevant hook events.
 
-- `hooks/development/` — auto-format, session-context loader, save-summary, speak-commit (TTS).
+- `hooks/development/` — auto-format, session-context loader, save-summary, speak-commit (TTS), `skill-dirty-marker.sh` (PostToolUse on `Write|Edit|MultiEdit`: detects edits under `~/.claude/skills/<name>/` and appends the skill name to `~/.claude/.skills-dirty` so a later sync step knows what to push; ignores `config.json`, `.env*`, `*.local.*`, `*.token`, `*.secret`).
 - `hooks/notifications/` — local + remote notification scripts. The remote variant auto-detects Telegram / ntfy.sh from env vars (`CLAUDE_TELEGRAM_TOKEN`, `CLAUDE_TELEGRAM_CHAT_ID`, `CLAUDE_NTFY_TOPIC`). **Never commit your actual token values** — keep them in a `.env` file (gitignored) and source it from your shell rc.
 - `hooks/standup-tracker/` — end-of-session reminder that nudges me to run `/standup` before logging off.
 - `hooks/statusline/` — the script behind the `context-window-statusline` skill.
