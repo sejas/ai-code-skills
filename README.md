@@ -61,8 +61,7 @@ Lightweight ticketing inside `~/claude.nosync/intents/`. Each intent is a markdo
 | Skill | How I use it |
 |---|---|
 | `today` | Enriched daily activity from Claude Code sessions — branches, PRs, Linear issues, what I worked on. Run at end of day. |
-| `work-standup` | **Automattic-style standup** at `${STANDUP_PATH}/YYYY-MM-DD.md`. Pulls PRs from `github.com` (via `gh`) and a GitHub Enterprise host (via `context-a8c` MCP), dedupes, and appends without rewriting existing notes. Configure with `STANDUP_PATH`, `STANDUP_GH_USER`, `STANDUP_GH_USER_ENTERPRISE`, `STANDUP_ENTERPRISE_OWNER`, `STANDUP_ENTERPRISE_REPOS`. I run `/work-standup` once at end of day before posting in Slack. |
-| `standup` | Older generic version of the standup tracker (Obsidian diary block with `Claude Code Session` timestamp). Kept for reference / non-a8c users. |
+| `standup` | Daily standup file at `${STANDUP_PATH}/YYYY-MM-DD.md`. Pulls PRs from `github.com` (via `gh`) and an optional GitHub Enterprise host (via `context-a8c` MCP), dedupes across Created / Merged / Reviewed sections, and appends without rewriting existing notes. Configure with `STANDUP_PATH`, `STANDUP_GH_USER`, `STANDUP_GH_USER_ENTERPRISE`, `STANDUP_ENTERPRISE_OWNER`, `STANDUP_ENTERPRISE_REPOS`. I run `/standup` once at end of day before posting in Slack. |
 
 ### Content
 
@@ -86,7 +85,7 @@ Standalone bash hook scripts, opt-in. Wire them into `~/.claude/settings.json` u
 
 - `hooks/development/` — auto-format, session-context loader, save-summary, speak-commit (TTS).
 - `hooks/notifications/` — local + remote notification scripts. The remote variant auto-detects Telegram / ntfy.sh from env vars (`CLAUDE_TELEGRAM_TOKEN`, `CLAUDE_TELEGRAM_CHAT_ID`, `CLAUDE_NTFY_TOPIC`). **Never commit your actual token values** — keep them in a `.env` file (gitignored) and source it from your shell rc.
-- `hooks/standup-tracker/` — end-of-session reminder that nudges me to run `/work-standup` before logging off.
+- `hooks/standup-tracker/` — end-of-session reminder that nudges me to run `/standup` before logging off.
 - `hooks/statusline/` — the script behind the `context-window-statusline` skill.
 
 ## Secrets

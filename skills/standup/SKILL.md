@@ -1,162 +1,191 @@
 ---
 name: standup
-description: Update daily Obsidian diary with PRs created, PRs reviewed, and Linear issues worked on. Run at end of work session to track your daily activity.
+description: Create or update today's work standup file. Pulls PR activity from a GitHub Enterprise host (via context-a8c MCP) and github.com (via gh CLI), deduplicates across sources and sections, preserves existing content. Use when the user says "update my standup", "today standup", "fill my standup", or invokes /standup.
 user-invocable: true
 ---
 
-# Daily Standup Tracker
+# Work Standup Tracker
 
-Update the user's daily Obsidian diary with work activity from this session.
+Maintains a daily standup markdown file. Designed for users who work across a GitHub Enterprise host (e.g. Automattic's `github.a8c.com`) and `github.com`, but works with either source alone.
 
-## Configuration
+## Configuration (env vars)
 
-- **Diary path:** `$STANDUP_DIARY_PATH` (set this env var to your Obsidian diary folder, e.g. `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/<vault>/Diary/`)
-- **File format:** `YYYY-MM-DD.md`
+Set these once (e.g. in your shell rc):
+
+| Env var | Purpose | Example |
+|---|---|---|
+| `STANDUP_PATH` | Directory where daily files live | `~/Documents/notes/work/standup/` |
+| `STANDUP_GH_USER` | Your `github.com` login | `your-handle` |
+| `STANDUP_GH_USER_ENTERPRISE` | Your Enterprise host login (optional) | `your-handle-a8c` |
+| `STANDUP_ENTERPRISE_OWNER` | Enterprise org/owner (optional) | `Automattic` |
+| `STANDUP_ENTERPRISE_REPOS` | Comma-separated repo list to scan (optional) | `wpcom,studio,jetpack` |
+
+The file is written to `${STANDUP_PATH}/YYYY-MM-DD.md` using today's local date.
+
+## Output format (match exactly)
+
+```
+#yolo-standup 
+Today:
+
+- Created PRs:
+    - [<auto-title>](<pr-url>)
+- Merged:
+    - [<auto-title>](<pr-url>)
+- Reviewed:
+    - [<auto-title>](<pr-url>)
+
+<free-form bullets / notes at top level, no header>
+
+Next:
+- <bullet>
+```
+
+**Auto-title pattern:** `<PR title> by <author> · Pull Request #<number> · <owner>/<repo>` — matches GitHub's own `<title>` element.
+
+**Style rules:**
+
+- Section headers are top-level `- ` bullets ending in `:` (e.g. `- Created PRs:`).
+- PR links nest one level deeper as `- ` bullets, indented with 4 spaces (or one tab).
+- No inline state annotations (`— open`, `— merged`, timestamps). Section placement carries that info.
+- No "Other:" header — free-form lines live at top level between Reviewed and Next.
+- Sections are omitted when empty; never leave empty headers.
+- Trailing space after `#yolo-standup` is intentional (file convention).
+
+## Section rules
+
+| Section | Inclusion rule |
+|---|---|
+| **Created PRs** | PRs authored by the user whose `created_at` is today (local tz). Includes PRs created today that were also merged today. |
+| **Merged** | PRs authored by the user with `merged_at` today AND `created_at` < today. |
+| **Reviewed** | PRs NOT authored by the user that have a review by the user with `submitted_at` today. Exclude PRs already in Created or Merged. |
+| Free-form | Manual notes (meetings, blockers, learnings). Preserved verbatim. |
+| **Next:** | Manual TODO bullets for tomorrow. Preserved verbatim. |
+
+## Dedupe rules
+
+- **Cross-section:** a PR URL appears in at most one section, priority: Created > Merged > Reviewed.
+- **Cross-source:** the same PR URL must not appear twice even if it surfaces from both `gh` and the Enterprise MCP. Normalize URLs (strip trailing slash, query string) before comparing.
+- **Append-aware:** if the file already lists a PR URL anywhere, do not add it again. Manually-written free-form lines stay untouched.
 
 ## Workflow
 
-### Step 1: Gather Data
+### Step 1 — Gather data, in parallel
 
-Run these data gathering steps in parallel:
+#### 1a. GitHub Enterprise via context-a8c MCP (optional)
 
-#### 1a. PRs Created Today (GitHub CLI)
-```bash
-gh pr list --author=@me --state=all --json url,title,number,headRefName --search "created:$(date +%Y-%m-%d)"
+If `STANDUP_GH_USER_ENTERPRISE` is set, load the provider once per session:
+
+```
+mcp__context-a8c__context-a8c-load-provider  provider: "github-a8c"
 ```
 
-#### 1b. PRs Reviewed Today (GitHub API)
+For each repo in `STANDUP_ENTERPRISE_REPOS`:
+
+```
+mcp__context-a8c__context-a8c-execute-tool
+  provider: "github-a8c"
+  tool: "search-pull-requests"
+  params: { query: "author:${STANDUP_GH_USER_ENTERPRISE} updated:YYYY-MM-DD", owner: "${STANDUP_ENTERPRISE_OWNER}", repo: "<repo>", perPage: 50 }
+```
+
+Then the same with `reviewed-by:${STANDUP_GH_USER_ENTERPRISE}`.
+
+> Note: global queries return 0 results on this host; always scope by `owner` + `repo`.
+
+If output exceeds the response limit, the MCP server saves JSON to a file path — use `jq` to extract `{number, title, state, created_at, updated_at, closed_at, merged_at, html_url, user.login, pull_request.merged_at}`.
+
+#### 1b. github.com via gh CLI
+
 ```bash
-TODAY=$(date -u +%Y-%m-%dT00:00:00Z)
+gh pr list --author=@me --state=all \
+  --json url,title,number,createdAt,mergedAt,state,headRepository,headRepositoryOwner \
+  --search "created:$(date +%Y-%m-%d) OR updated:$(date +%Y-%m-%d)"
+```
+
+Reviews via GraphQL:
+
+```bash
+TODAY=$(date +%Y-%m-%d)
+FROM="${TODAY}T00:00:00Z"
 gh api graphql -f query='
 query($from: DateTime!) {
   viewer {
     contributionsCollection(from: $from) {
       pullRequestReviewContributions(first: 50) {
-        nodes {
-          pullRequest {
-            url
-            title
-            number
-            headRefName
-          }
-        }
+        nodes { pullRequest { url title number author { login } merged createdAt } }
+      }
+      pullRequestContributions(first: 50) {
+        nodes { pullRequest { url title number merged mergedAt createdAt state } }
       }
     }
   }
-}' -f from="$TODAY"
+}' -f from="$FROM"
 ```
 
-#### 1c. Branches Worked On Today (Git)
-```bash
-git reflog --date=local --since="midnight" --format="%gs" | grep -E "checkout: moving .* to " | sed 's/checkout: moving .* to //' | sort -u
+### Step 2 — Classify each PR
+
+For PRs authored by the user (login = `$STANDUP_GH_USER` or `$STANDUP_GH_USER_ENTERPRISE`):
+
+- `created_at` == today → **Created PRs**.
+- `created_at` < today AND `merged_at` == today → **Merged**.
+- Otherwise (still open from before today, or closed-not-merged) → ignore unless explicitly mentioned in free-form.
+
+For PRs not authored by the user with a review submitted today → **Reviewed**, only if the URL isn't already in Created or Merged.
+
+### Step 3 — Resolve auto-title
+
+Build the link using the auto-title pattern. Pull `title`, `user.login`, `number`, owner/repo (from `html_url` or `repository_url`).
+
+Example:
+
+```
+[Some PR title by your-handle · Pull Request #12345 · owner/repo](https://github.com/owner/repo/pull/12345)
 ```
 
-#### 1d. Linear Issues Created Today (context-a8c)
-Use the context-a8c Linear provider:
-1. Load provider: `mcp__plugin_context-a8c_context-a8c__context-a8c-load-provider` with `provider: "linear"`
-2. Execute tool to search issues created by me today
+### Step 4 — Read existing file
 
-### Step 2: Extract Issue IDs
+Path: `${STANDUP_PATH}/YYYY-MM-DD.md`. Quote the path in bash (folders may contain spaces or emoji).
 
-From gathered data, extract Linear issue IDs (patterns like `STU-1234`, `DEVELOPER-123`, etc.):
-- From PR branch names (headRefName)
-- From branches worked on
-- Issues are typically prefixed with team codes followed by numbers
+If the file doesn't exist, scaffold:
 
-### Step 3: Query Linear for Issue Details
-
-For each unique issue ID found, use context-a8c Linear provider to get:
-- Issue title
-- Issue URL
-- Issue status
-
-Also query for issues created by the user today.
-
-### Step 4: Deduplicate
-
-Build sets to avoid showing same item in multiple sections:
-1. **PR issue IDs** - Issues linked to PRs you created
-2. **Review issue IDs** - Issues linked to PRs you reviewed
-3. **Issues worked on** = All branch issues - PR issue IDs - Review issue IDs
-
-### Step 5: Read/Create Daily File
-
-**File path:** `$STANDUP_DIARY_PATH/YYYY-MM-DD.md`
-
-If file doesn't exist, create with template:
-```markdown
-#yolo-standup
+```
+#yolo-standup 
 Today:
-- Created PRs:
-	-
-- Reviewed:
-	-
+
 Next:
--
+
 ```
 
-### Step 6: Merge with Existing Block
+If the file exists, parse section-by-section. Collect every PR URL already present into a known-set for dedup.
 
-Check if file already contains a `---\n**Claude Code Session` block.
+### Step 5 — Merge
 
-**If exists:**
-1. Parse existing items by extracting URLs from each section
-2. Merge new items, skipping any URL that already exists in ANY section
-3. Update timestamp to current time
-4. Replace the old block with merged content
+- For each new PR URL not in the known-set, append it to its target section in classification order (Created → Merged → Reviewed).
+- Preserve every existing PR line, free-form line, and Next: bullet exactly as-is. The skill is additive — never rewrites or reorders existing content.
+- If the file is missing one of the headers and there's content for it, insert the header in canonical order.
+- Never insert an empty header.
 
-**If not exists:**
-- Append new block at end of file
+### Step 6 — Write
 
-### Step 7: Write Output
+Write the merged file. Confirm with the user:
 
-Format the session block:
+1. New PRs added per section.
+2. Duplicates skipped (per source).
+3. Hosts that errored (note `github-a8c` 422 errors for repos that don't exist or are inaccessible).
 
-```markdown
----
-**Claude Code Session (HH:MM)**
-- Created PRs:
-    - [PR title #number](url)
-- Reviewed:
-    - [PR title #number](url)
-- Issues worked on:
-    - [ISSUE-ID - Issue title](url)
-- Issues created:
-    - [ISSUE-ID - Issue title](url)
-```
+## Pitfalls
 
-**Rules:**
-- Omit any section that has no items
-- Use 24-hour time format for timestamp
-- PR format: `[Title #number](url)`
-- Issue format: `[ISSUE-ID - Title](url)`
+- **Timezone:** GitHub returns UTC. Convert to the user's local date before comparing to "today". A PR at `2026-05-14T23:30:00Z` is `2026-05-15` for UTC+1.
+- **Search index lag:** Enterprise search can lag by minutes for very fresh PRs. Retry once after a short pause; fall back to fetching by number with the `pull-request` tool if still missing.
+- **Multiple repos:** when a repo returns nothing and the user expected activity, ask which repo to query rather than guessing.
+- **Path quoting:** `STANDUP_PATH` may contain spaces or emoji (e.g. `💼 work/standup`). Quote everywhere in bash.
+- **No revert of user edits:** if the user previously trimmed annotations, do not re-add them on the next run.
 
-### Step 8: Confirm
+## Done criteria
 
-Show the user:
-1. Summary of what was added
-2. The updated session block content
-3. Confirm the file was updated
-
-## Example Output
-
-```markdown
----
-**Claude Code Session (16:45)**
-- Created PRs:
-    - [Fix some bug #123](https://github.com/owner/repo/pull/123)
-- Reviewed:
-    - [Update some logic #124](https://github.com/owner/repo/pull/124)
-- Issues worked on:
-    - [STU-1234 - Backend refactor for site deletion](https://linear.app/...)
-- Issues created:
-    - [STU-5678 - Deep dive on Telex integration](https://linear.app/...)
-```
-
-## Important Notes
-
-- Always use the context-a8c MCP provider for Linear data, not direct API calls
-- The diary path contains spaces - handle properly in bash commands
-- Parse branch names for issue IDs using regex: `[A-Z]+-[0-9]+`
-- Deduplication is by URL, not by title
-- Preserve user's manual notes - only modify the Claude Code Session block
+- File at `${STANDUP_PATH}/YYYY-MM-DD.md` exists with today's PR activity split into Created / Merged / Reviewed.
+- No URL appears in more than one section.
+- No URL appears twice within a section.
+- All pre-existing free-form bullets and `Next:` entries are untouched.
+- Short summary printed listing what was added and what was deduped.
