@@ -82,6 +82,28 @@ Use `~/claude.nosync/` as your workspace for plans, artifacts, and coordination:
 # Don't commit or publish comments online
 - When reviewing never try posting your comments online in GitHub
 - When working in code, never commit or stage your changes
+- **Exception:** the skill-sync workflow below — that repo IS allowed to receive commits + pushes.
+
+# Skill Sync
+When creating or updating any file in `~/.claude/skills/<name>/`, mirror it to the public repo and push.
+
+## Workflow
+1. The `~/.claude/hooks/skill-dirty-marker.sh` PostToolUse hook records the edited skill name to `~/.claude/.skills-dirty` automatically.
+2. When the user says "sync skills" / "push skill" / runs `/sync-skills`, invoke the `sync-skills` skill, which:
+   - Reads `~/.claude/.skills-dirty`.
+   - Sanitizes each dirty skill (strip personal usernames, emails, vault paths, tokens — see the skill's sanitization rules).
+   - Copies sanitized files to `~/Documents/projects-m3.nosync/personal/ai-code-skills/skills/<name>/`.
+   - Updates the repo's `README.md` if the skill is new or renamed.
+   - Runs a secret-and-personal-ID scan on the staged diff. Aborts on any hit.
+   - Commits on `main` (subject ≤75 chars — repo hook enforces).
+   - Pushes to `origin/main`.
+   - Clears the marker.
+
+## What NEVER syncs
+- `config.json` (per-user state).
+- `*.local.*`, `.env*`, `*.token`, `*.secret`.
+- Hooks that hardcode personal identifiers — generalize first.
+- Anything matching the secret regex (api keys, bearer tokens, ghp_*, sk-*, xox[abps]-*, Telegram bot-token shapes).
 
 # Be clear about your suggestions
 - Always provide diffs of your suggestions
