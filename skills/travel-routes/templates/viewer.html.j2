@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Travel routes — viewer</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
+  <style>
+    :root {
+      --bg: #f7f7f9; --fg: #111; --muted: #555; --card: #fff; --border: #e3e3e7;
+      --accent: #2563eb;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0f1115; --fg: #f4f4f7; --muted: #9aa0a8; --card: #181b22; --border: #2a2d36; }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--fg); background: var(--bg); }
+    #map { position: absolute; inset: 0; }
+    .toolbar {
+      position: absolute; top: 12px; left: 12px; right: 12px; z-index: 1;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .toolbar h1 { margin: 0; font-size: 14px; font-weight: 600; }
+    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; }
+    .row label { color: var(--muted); }
+    .row input[type=date] {
+      background: var(--bg); color: var(--fg); border: 1px solid var(--border);
+      padding: 4px 6px; border-radius: 6px; font: inherit;
+    }
+    .presets { display: flex; flex-wrap: wrap; gap: 4px; }
+    .btn {
+      display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px;
+      border: 1px solid var(--border); background: var(--bg); color: var(--fg);
+      cursor: pointer; font-family: inherit; text-decoration: none;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px; }
+    .legend .item {
+      display: inline-flex; align-items: center; gap: 5px; font-size: 11px;
+      padding: 2px 7px; border-radius: 999px; background: var(--bg); border: 1px solid var(--border);
+      cursor: pointer; user-select: none;
+    }
+    .legend .item.off { opacity: 0.35; }
+    .legend .item input { margin: 0; display: none; }
+    .legend .swatch { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .stats { color: var(--muted); font-size: 12px; }
+    .stats b { color: var(--fg); }
+    .actions { display: flex; gap: 6px; margin-left: auto; }
+    .popup-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; color: #111; }
+    .popup-meta { font-size: 12px; color: #555; }
+    .maplibregl-popup-content { padding: 10px 12px; min-width: 180px; }
+    .loader { font-size: 11px; color: var(--muted); }
+    .loader.busy::after { content: " · loading…"; }
+    .fatal { padding: 20px; font-size: 14px; color: var(--fg); }
+    .fatal code { background: var(--card); padding: 2px 6px; border-radius: 4px; }
+    @media (max-width: 640px) {
+      .toolbar { left: 8px; right: 8px; top: 8px; padding: 10px; }
+      .actions { margin-left: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="row">
+      <h1>Travel routes</h1>
+      <span class="loader" id="loader"></span>
+      <div class="actions">
+        <button class="btn" id="download-btn" type="button">Download JSON</button>
+        <a class="btn" id="open-year-btn" target="_blank" rel="noopener">Open year ↗</a>
+      </div>
+    </div>
+    <div class="row">
+      <label for="start-input">Start</label>
+      <input type="date" id="start-input" />
+      <label for="end-input">End</label>
+      <input type="date" id="end-input" />
+      <div class="presets" id="presets"></div>
+    </div>
+    <div class="row">
+      <span class="stats" style="margin-right:4px;">Years:</span>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="row">
+      <span class="stats">
+        <b id="stat-photos">0</b> photos ·
+        <b id="stat-places">0</b> places ·
+        <b id="stat-cities">0</b> cities ·
+        <b id="stat-countries">0</b> countries
+      </span>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <script>
+    const MANIFEST_URL = "manifest.json";
+    const yearDataCache = new Map();        // year -> Promise<data>
+    let manifest = null;
+    let disabledYears = new Set();
+    let map = null;
+    let mapLoaded = false;
+    let mapReady = null;          // Promise that resolves when map fires 'load'
+    let filteredClustersByYear = new Map();
+
+    async function fetchYearData(year) {
+      if (yearDataCache.has(year)) return yearDataCache.get(year);
+      const entry = manifest.years.find(y => y.year === year);
+      if (!entry) return null;
+      const promise = fetch(entry.data_url).then(r => {
+        if (!r.ok) throw new Error(`failed to fetch ${entry.data_url}: ${r.status}`);
+        return r.json();
+      });
+      yearDataCache.set(year, promise);
+      return promise;
+    }
+
+    function parseQuery() {
+      const u = new URL(window.location.href);
+      const start = u.searchParams.get("start");
+      const end = u.searchParams.get("end");
+      const isValid = (d) => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d);
+      if (isValid(start) && isValid(end) && start <= end) return { start, end };
+      if (start || end) console.warn("Ignoring invalid start/end query params:", { start, end });
+      return null;
+    }
+
+    function setQuery(start, end) {
+      const u = new URL(window.location.href);
+      u.searchParams.set("start", start);
+      u.searchParams.set("end", end);
+      window.history.replaceState({}, "", u.toString());
+    }
+
+    function yearsInRange(start, end) {
+      const ys = parseInt(start.slice(0, 4), 10);
+      const ye = parseInt(end.slice(0, 4), 10);
+      const out = [];
+      for (let y = ys; y <= ye; y++) {
+        if (manifest.years.some(m => m.year === y)) out.push(y);
+      }
+      return out;
+    }
+
+    function overlaps(clusterStart, clusterEnd, start, end) {
+      const cs = clusterStart.slice(0, 10);
+      const ce = clusterEnd.slice(0, 10);
+      return cs <= end && ce >= start;
+    }
+
+    async function applyRange(start, end) {
+      const loader = document.getElementById("loader");
+      loader.classList.add("busy");
+      try {
+        const years = yearsInRange(start, end);
+        const [datas] = await Promise.all([
+          Promise.all(years.map(y => fetchYearData(y).then(d => ({ year: y, data: d })))),
+          mapReady,
+        ]);
+        filteredClustersByYear = new Map();
+        for (const { year, data } of datas) {
+          if (!data) continue;
+          const filtered = (data.clusters || []).filter(c =>
+            c.kind === "place" &&
+            c.place && c.place.slug && c.place.slug !== "unknown" &&
+            overlaps(c.start_ts, c.end_ts, start, end)
+          );
+          filteredClustersByYear.set(year, filtered);
+        }
+        renderMap();
+        renderStats();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load data: " + err.message);
+      } finally {
+        loader.classList.remove("busy");
+      }
+    }
+
+    function visibleClusters() {
+      const out = [];
+      for (const [year, clusters] of filteredClustersByYear) {
+        if (disabledYears.has(year)) continue;
+        for (const c of clusters) out.push({ ...c, _year: year });
+      }
+      return out;
+    }
+
+    function clustersToFC(clusters) {
+      const features = clusters.map(c => ({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [c.centroid[1], c.centroid[0]] },
+        properties: {
+          year: c._year,
+          city: (c.place && c.place.city) || "unknown",
+          country: (c.place && c.place.country) || "",
+          slug: (c.place && c.place.slug) || "unknown",
+          photos: c.photo_count || 0,
+          start_ts: c.start_ts.slice(0, 10),
+          end_ts: c.end_ts.slice(0, 10),
+          color: manifest.year_colors[String(c._year)] || "#2563eb",
+        },
+      }));
+      return { type: "FeatureCollection", features };
+    }
+
+    function clustersToRoutes(clusters) {
+      // One LineString per year, connecting cluster centroids in chronological order.
+      const byYear = new Map();
+      for (const c of clusters) {
+        if (!byYear.has(c._year)) byYear.set(c._year, []);
+        byYear.get(c._year).push(c);
+      }
+      const features = [];
+      for (const [year, list] of byYear) {
+        list.sort((a, b) => a.start_ts.localeCompare(b.start_ts));
+        if (list.length < 2) continue;
+        const coords = list.map(c => [c.centroid[1], c.centroid[0]]);
+        features.push({
+          type: "Feature",
+          geometry: { type: "LineString", coordinates: coords },
+          properties: {
+            year,
+            color: manifest.year_colors[String(year)] || "#2563eb",
+          },
+        });
+      }
+      return { type: "FeatureCollection", features };
+    }
+
+    function fcBBox(fc) {
+      if (!fc.features.length) return null;
+      let minX = 180, minY = 90, maxX = -180, maxY = -90;
+      for (const f of fc.features) {
+        const [x, y] = f.geometry.coordinates;
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+      }
+      return [[minX, minY], [maxX, maxY]];
+    }
+
+    function ensureLayers() {
+      if (!map.getLayer("routes")) {
+        map.addLayer({
+          id: "routes",
+          type: "line",
+          source: "routes",
+          layout: { "line-join": "round", "line-cap": "round" },
+          paint: {
+            "line-color": ["get", "color"],
+            "line-width": [
+              "interpolate", ["linear"], ["zoom"],
+              1, 1,
+              5, 2,
+              10, 3,
+              14, 4,
+            ],
+            "line-opacity": 0.65,
+          },
+        });
+      }
+      if (!map.getLayer("points")) {
+        map.addLayer({
+          id: "points",
+          type: "circle",
+          source: "places",
+          paint: {
+            "circle-color": ["get", "color"],
+            "circle-radius": [
+              "interpolate", ["linear"], ["zoom"],
+              1, 3,
+              5, 5,
+              10, 7,
+              14, 9,
+            ],
+            "circle-stroke-width": 1.5,
+            "circle-stroke-color": "#fff",
+            "circle-opacity": 0.95,
+          },
+        });
+      }
+    }
+
+    function renderMap() {
+      if (!mapLoaded) return;
+      const visible = visibleClusters();
+      const placesFC = clustersToFC(visible);
+      const routesFC = clustersToRoutes(visible);
+
+      const placesSrc = map.getSource("places");
+      const routesSrc = map.getSource("routes");
+
+      if (!routesSrc) map.addSource("routes", { type: "geojson", data: routesFC });
+      else routesSrc.setData(routesFC);
+
+      if (!placesSrc) map.addSource("places", { type: "geojson", data: placesFC });
+      else placesSrc.setData(placesFC);
+
+      ensureLayers();
+
+      const bbox = fcBBox(placesFC);
+      if (bbox) map.fitBounds(bbox, { padding: 100, maxZoom: 8, duration: 300 });
+    }
+
+    function renderStats() {
+      const visible = visibleClusters();
+      const photos = visible.reduce((s, c) => s + (c.photo_count || 0), 0);
+      const places = visible.length;
+      const cities = new Set(visible.map(c => c.place && c.place.slug)).size;
+      const countries = new Set(visible.map(c => c.place && c.place.country).filter(Boolean)).size;
+      document.getElementById("stat-photos").textContent = photos.toLocaleString();
+      document.getElementById("stat-places").textContent = String(places);
+      document.getElementById("stat-cities").textContent = String(cities);
+      document.getElementById("stat-countries").textContent = String(countries);
+      const startVal = document.getElementById("start-input").value;
+      const year = startVal.slice(0, 4);
+      const folder = manifest.years.find(y => String(y.year) === year);
+      const openYear = document.getElementById("open-year-btn");
+      if (folder) {
+        openYear.href = folder.data_url.replace(/\/data\.json$/, "/map.html");
+        openYear.style.display = "";
+      } else {
+        openYear.style.display = "none";
+      }
+    }
+
+    function buildLegendItem(entry, color) {
+      const wrap = document.createElement("label");
+      wrap.className = "item";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.dataset.year = String(entry.year);
+      input.checked = !disabledYears.has(entry.year);
+      const swatch = document.createElement("span");
+      swatch.className = "swatch";
+      swatch.style.background = color;
+      const text = document.createTextNode(String(entry.year));
+      wrap.append(input, swatch, text);
+      if (disabledYears.has(entry.year)) wrap.classList.add("off");
+      input.addEventListener("change", () => {
+        const y = entry.year;
+        if (input.checked) disabledYears.delete(y); else disabledYears.add(y);
+        wrap.classList.toggle("off", !input.checked);
+        renderMap();
+        renderStats();
+      });
+      return wrap;
+    }
+
+    function renderLegend() {
+      const legend = document.getElementById("legend");
+      legend.replaceChildren();
+      [...manifest.years].sort((a, b) => b.year - a.year).forEach(entry => {
+        const color = manifest.year_colors[String(entry.year)] || "#2563eb";
+        legend.appendChild(buildLegendItem(entry, color));
+      });
+    }
+
+    function renderPresets() {
+      const presets = document.getElementById("presets");
+      presets.replaceChildren();
+      const all = document.createElement("button");
+      all.type = "button";
+      all.className = "btn";
+      all.textContent = "All";
+      all.addEventListener("click", () => {
+        setInputs(manifest.earliest_date, manifest.latest_date);
+        triggerApply();
+      });
+      presets.appendChild(all);
+      [...manifest.years].sort((a, b) => b.year - a.year).forEach(entry => {
+        if (entry.places === 0) return;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn";
+        btn.textContent = String(entry.year);
+        btn.addEventListener("click", () => {
+          setInputs(`${entry.year}-01-01`, `${entry.year}-12-31`);
+          triggerApply();
+        });
+        presets.appendChild(btn);
+      });
+    }
+
+    function setInputs(start, end) {
+      document.getElementById("start-input").value = start;
+      document.getElementById("end-input").value = end;
+    }
+
+    let debounceTimer = null;
+    function triggerApply() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const start = document.getElementById("start-input").value;
+        const end = document.getElementById("end-input").value;
+        if (!start || !end || start > end) return;
+        setQuery(start, end);
+        applyRange(start, end);
+      }, 150);
+    }
+
+    function attachInputListeners() {
+      document.getElementById("start-input").addEventListener("change", triggerApply);
+      document.getElementById("end-input").addEventListener("change", triggerApply);
+      document.getElementById("download-btn").addEventListener("click", downloadFiltered);
+    }
+
+    function downloadFiltered() {
+      const start = document.getElementById("start-input").value;
+      const end = document.getElementById("end-input").value;
+      const visible = visibleClusters();
+      const payload = {
+        generated_at: new Date().toISOString(),
+        range: { start, end },
+        disabled_years: [...disabledYears].sort(),
+        cluster_count: visible.length,
+        clusters: visible.map(c => ({
+          year: c._year,
+          centroid: c.centroid,
+          start_ts: c.start_ts,
+          end_ts: c.end_ts,
+          photo_count: c.photo_count,
+          dwell_minutes: c.dwell_minutes,
+          place: c.place,
+          photo_uuids: c.photo_uuids,
+          representative_uuids: c.representative_uuids,
+        })),
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `travel-routes-${start}_to_${end}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60_000);
+    }
+
+    function buildPopup(props) {
+      const wrap = document.createElement("div");
+      const title = document.createElement("div");
+      title.className = "popup-title";
+      title.textContent = props.country
+        ? `${props.city}, ${props.country}`
+        : String(props.city);
+      const meta = document.createElement("div");
+      meta.className = "popup-meta";
+      const line1 = document.createElement("span");
+      line1.textContent = `${props.year} · ${props.photos} photos`;
+      meta.appendChild(line1);
+      meta.appendChild(document.createElement("br"));
+      const line2 = document.createElement("span");
+      line2.textContent = props.end_ts !== props.start_ts
+        ? `${props.start_ts} → ${props.end_ts}`
+        : String(props.start_ts);
+      meta.appendChild(line2);
+      wrap.append(title, meta);
+      return wrap;
+    }
+
+    function initMap() {
+      map = new maplibregl.Map({
+        container: "map",
+        style: "https://tiles.openfreemap.org/styles/liberty",
+        center: [0, 20],
+        zoom: 1.4,
+      });
+      mapReady = new Promise((resolve) => {
+        map.on("load", () => {
+          mapLoaded = true;
+          map.on("click", (e) => {
+            if (!map.getLayer("points")) return;
+            const pointsHit = map.queryRenderedFeatures(e.point, { layers: ["points"] });
+            if (pointsHit.length) {
+              const f = pointsHit[0];
+              new maplibregl.Popup({ offset: 12 })
+                .setLngLat(f.geometry.coordinates)
+                .setDOMContent(buildPopup(f.properties))
+                .addTo(map);
+            }
+          });
+          map.on("mousemove", (e) => {
+            if (!map.getLayer("points")) { map.getCanvas().style.cursor = ""; return; }
+            const hit = map.queryRenderedFeatures(e.point, { layers: ["points"] }).length > 0;
+            map.getCanvas().style.cursor = hit ? "pointer" : "";
+          });
+          map.addControl(new maplibregl.NavigationControl(), "top-right");
+          resolve();
+        });
+      });
+    }
+
+    function showFatal(msg) {
+      document.body.replaceChildren();
+      const p = document.createElement("p");
+      p.className = "fatal";
+      const t1 = document.createTextNode(msg + " Run ");
+      const code = document.createElement("code");
+      code.textContent = "uv run build_viewer.py";
+      const t2 = document.createTextNode(" first.");
+      p.append(t1, code, t2);
+      document.body.appendChild(p);
+    }
+
+    async function boot() {
+      let res;
+      try {
+        res = await fetch(MANIFEST_URL);
+      } catch (e) {
+        showFatal("Failed to load manifest.json (network error).");
+        return;
+      }
+      if (!res.ok) {
+        showFatal(`Failed to load manifest.json (HTTP ${res.status}).`);
+        return;
+      }
+      manifest = await res.json();
+
+      const fromQuery = parseQuery();
+      const start = (fromQuery && fromQuery.start) || manifest.default_start;
+      const end = (fromQuery && fromQuery.end) || manifest.default_end;
+      setInputs(start, end);
+      setQuery(start, end);
+
+      renderLegend();
+      renderPresets();
+      attachInputListeners();
+      initMap();
+      applyRange(start, end);
+    }
+
+    boot();
+  </script>
+</body>
+</html>

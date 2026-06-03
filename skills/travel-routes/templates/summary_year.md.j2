@@ -1,0 +1,19 @@
+# {{ title }}
+
+**Photos**: {{ total_photos }}  •  **Places**: {{ place_count }}  •  **Countries**: {{ countries | length }}
+
+{% for month in months %}
+## {{ month.label }}
+
+{% for entry in month.entries -%}
+- [[{{ entry.slug }}|{{ entry.city }}]]{% if entry.country %} ({{ entry.country }}){% endif %} — {{ entry.start_date }}{% if entry.end_date != entry.start_date %} → {{ entry.end_date }}{% endif %} ({{ entry.photo_count }} photos)
+{% endfor %}
+{% endfor %}
+
+## Countries
+
+{% for country in countries -%}
+- {{ country }}
+{% endfor %}
+
+[Open map]({{ map_filename }})

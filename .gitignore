@@ -38,6 +38,9 @@ yarn-error.log*
 *.log
 logs/
 
+# Per-user skill config (never synced)
+skills/*/config.json
+
 # Testing
 .coverage
 htmlcov/

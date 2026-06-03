@@ -1,0 +1,96 @@
+---
+type: post
+slug: {{ slug }}
+title: {{ title }}
+date: {{ trip_end }}
+trip_start: {{ trip_start }}
+trip_end: {{ trip_end }}
+country: {{ country }}
+days: {{ days }}
+languages: [en]
+status: draft
+tags: [post, trip, {{ slug }}]
+---
+
+## English
+
+> _Pull quote — TODO: one line that captures the whole trip._
+
+### TL;DR — 5 things to steal
+
+{% for bullet in tldr_seed -%}
+- {{ bullet }}
+{% endfor -%}
+- TODO — your favourite meal, dish, or food memory
+- TODO — best wildlife / nature / cultural moment
+
+### At a glance
+
+| | |
+|---|---|
+| **Dates** | {{ trip_start }} → {{ trip_end }} ({{ days }} days) |
+| **Country** | {{ country }} |
+| **Cities** | {{ city_count }} — {{ cities_inline }} |
+| **Distance** | ~{{ distance_km }} km |
+| **Photos** | {{ total_photos }} |
+| **Best for** | TODO — road-trippers? families? slow travel? nature? |
+
+[Open the interactive map](~/claude.nosync/travel-routes/viewer.html?start={{ trip_start }}&end={{ trip_end }})
+
+### The story
+
+_TODO — your narrative spine. What made this trip yours. Anecdotes, food, surprises, people, weather. The auto-generated itinerary below is a scaffold; rewrite freely._
+
+{% for entry in itinerary -%}
+- **{{ entry.label }}** — [[{{ entry.slug }}|{{ entry.city }}]]{% if entry.poi %} · {{ entry.poi }}{% endif %}
+{% endfor %}
+
+### Highlights — what you shouldn't miss
+
+{% for h in highlights -%}
+#### [[{{ h.slug }}|{{ h.city }}]]{% if h.poi %} — {{ h.poi }}{% endif %}
+
+- **What it is**: TODO — one sentence describing the place / experience.
+- **Why it stuck**: TODO — one sentence about your moment there.
+- **How to repeat**:
+  - TODO — timing / best time of day
+  - TODO — booking / operator / how to access
+  - TODO — what to bring or wear
+
+{% endfor %}
+
+### If you go
+
+> [!tip] Best time to visit
+> TODO — month / season, weather notes, festivals or special events.
+
+> [!note] Getting around
+> TODO — rental car? trains? domestic flights? walking? Be specific.
+
+> [!warning] What we'd do differently
+> TODO — one or two honest regrets, what you'd skip or extend.
+
+#### Logistics
+
+- **Fly into**: TODO — airport code + name
+- **Get around**: TODO — transport mode + cost ballpark
+- **Sleep**: TODO — 2–3 recommended bases with neighbourhood vibe
+- **Eat**: TODO — 3 dishes to try, 1–2 specific places worth a detour
+- **Budget**: TODO — daily rate estimate (€X/day) and what drove it
+- **Pack**: TODO — one idiosyncratic packing tip nobody else mentions
+
+#### Sample itinerary (copy & adapt)
+
+{% for entry in itinerary -%}
+- **{{ entry.label }}** — [[{{ entry.slug }}|{{ entry.city }}]]{% if entry.poi %} · {{ entry.poi }}{% endif %}
+{% endfor %}
+
+### Photos & route
+
+[Photos and full interactive route map]({{ map_html_rel }})
+
+### Looking back
+
+_TODO — 100–200 words. The takeaway. Why you'd go back, or what you've already moved on from. The honest reflection._
+
+[Open the interactive map](~/claude.nosync/travel-routes/viewer.html?start={{ trip_start }}&end={{ trip_end }})

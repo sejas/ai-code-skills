@@ -44,6 +44,7 @@ Each skill is invoked by typing `/<skill-name>` in Claude Code, or by triggering
 | `react-doctor` | Scans recent React changes for common issues (hook deps, key warnings, state misuse). | After finishing a React feature, before /commit. |
 | `create-agents-md` | Generates `AGENTS.md` / `CLAUDE.md` for a repository documenting conventions and structure. | When starting a new repo or onboarding a coding agent. |
 | `studio-debug` | Inspects WordPress Studio local sites — SQLite DB, logs, plugin/theme issues. | When a Studio site misbehaves locally. |
+| `teach` | Acts as a teacher that makes me deeply understand the current session — problem, solution, edge cases, broader impact — via a running checklist, incremental confirmation, and quizzes (`AskUserQuestion`). | `/teach` after Claude lands a non-trivial change I want to actually internalize, not just merge. |
 
 ### Intents (spec-driven workflow)
 
@@ -71,6 +72,7 @@ Lightweight ticketing inside `~/claude.nosync/intents/`. Each intent is a markdo
 | `question` | Answers a question and renders the answer as a styled HTML page. Useful for sharing technical explanations as a link. |
 | `presentation` | Generates Marp slides from an intent spec. Turns an `intent-start` doc into a deck. |
 | `og-inspect` | Inspects a URL's Open Graph / Twitter Card metadata and renders multi-platform share-card previews (Facebook, X, LinkedIn, Slack, Tumblr). |
+| `travel-routes` | Extracts travel routes from Apple Photos geolocation (via `osxphotos`), clusters dwell points into visited cities, builds interactive maps, and scaffolds trip blog posts. Config via `config.json` (copy `config.example.json`); posts dir overridable with `$TRAVEL_POSTS_DIR`. | Building a vacation recap or year-in-review map from my photo library. |
 
 ### Productivity
 

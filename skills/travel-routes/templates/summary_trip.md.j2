@@ -1,0 +1,23 @@
+# {{ title }}
+
+**Photos**: {{ total_photos }}  •  **Places**: {{ place_count }}  •  **Countries**: {{ countries | length }}
+
+## Itinerary
+
+{% for step in itinerary -%}
+{{ loop.index }}. {{ step.start_date }}{% if step.end_date != step.start_date %} → {{ step.end_date }}{% endif %} — [[{{ step.slug }}|{{ step.city }}]]{% if step.country %} ({{ step.country }}){% endif %} — {{ step.photo_count }} photos
+{% endfor %}
+
+## Cities visited
+
+{% for c in cities -%}
+- [[{{ c.slug }}|{{ c.display }}]]{% if c.country %} ({{ c.country }}){% endif %}
+{% endfor %}
+
+## Countries
+
+{% for country in countries -%}
+- {{ country }}
+{% endfor %}
+
+[Open map]({{ map_filename }})

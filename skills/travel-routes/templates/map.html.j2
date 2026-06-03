@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    #map { position: absolute; inset: 0; }
+    .panel { position: absolute; top: 12px; left: 16px; z-index: 1; padding: 10px 14px; background: rgba(255,255,255,0.95); border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); max-width: 280px; }
+    .panel h1 { margin: 0 0 6px; font-size: 16px; }
+    .panel .stats { display: flex; gap: 14px; font-size: 12px; color: #555; }
+    .panel .stats b { display: block; color: #111; font-size: 16px; font-weight: 700; }
+    .marker { width: 22px; height: 22px; border-radius: 50%; background: #2563eb; border: 3px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.35); cursor: pointer; }
+    .popup-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+    .popup-meta { font-size: 12px; color: #555; margin-bottom: 8px; }
+    .popup-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; max-width: 320px; }
+    .popup-thumbs img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; }
+    .maplibregl-popup-content { padding: 10px 12px; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>{{ title }}</h1>
+    <div class="stats">
+      <div><b>{{ "{:,}".format(total_photos) }}</b>photos</div>
+      <div><b>{{ city_count }}</b>cities</div>
+      <div><b>{{ country_count }}</b>countries</div>
+      <div><b>{{ place_count }}</b>places</div>
+    </div>
+  </div>
+  <div id="map"></div>
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <script>
+    const LINE = {{ line_coords_json | safe }};
+    const MARKERS = {{ markers_json | safe }};
+    const BBOX = {{ bbox_json | safe }};
+
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://tiles.openfreemap.org/styles/liberty',
+      bounds: BBOX,
+      fitBoundsOptions: { padding: 60 },
+    });
+
+    map.on('load', () => {
+      if (LINE.length >= 2) {
+        map.addSource('route', {
+          type: 'geojson',
+          data: { type: 'Feature', geometry: { type: 'LineString', coordinates: LINE } },
+        });
+        map.addLayer({
+          id: 'route-line',
+          type: 'line',
+          source: 'route',
+          layout: { 'line-join': 'round', 'line-cap': 'round' },
+          paint: { 'line-color': '#2563eb', 'line-width': 3, 'line-opacity': 0.75 },
+        });
+      }
+      MARKERS.forEach((m) => {
+        const el = document.createElement('div');
+        el.className = 'marker';
+        const html = [
+          `<div class="popup-title">${escapeHtml(m.city)}${m.country ? ', ' + escapeHtml(m.country) : ''}</div>`,
+          `<div class="popup-meta">${m.start_ts}${m.end_ts !== m.start_ts ? ' → ' + m.end_ts : ''} · ${m.photo_count} photos</div>`,
+        ];
+        if (m.thumbs && m.thumbs.length) {
+          html.push('<div class="popup-thumbs">' + m.thumbs.map(t => `<img src="${t}" loading="lazy" />`).join('') + '</div>');
+        }
+        new maplibregl.Marker(el)
+          .setLngLat([m.lon, m.lat])
+          .setPopup(new maplibregl.Popup({ offset: 18, maxWidth: '360px' }).setHTML(html.join('')))
+          .addTo(map);
+      });
+      map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    });
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+    }
+  </script>
+</body>
+</html>
