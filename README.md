@@ -45,6 +45,7 @@ Each skill is invoked by typing `/<skill-name>` in Claude Code, or by triggering
 | `create-agents-md` | Generates `AGENTS.md` / `CLAUDE.md` for a repository documenting conventions and structure. | When starting a new repo or onboarding a coding agent. |
 | `studio-debug` | Inspects WordPress Studio local sites — SQLite DB, logs, plugin/theme issues. | When a Studio site misbehaves locally. |
 | `teach` | Acts as a teacher that makes me deeply understand the current session — problem, solution, edge cases, broader impact — via a running checklist, incremental confirmation, and quizzes (`AskUserQuestion`). | `/teach` after Claude lands a non-trivial change I want to actually internalize, not just merge. |
+| `score` | Calibrated 0–10 judging of any artifact — website/UI (screenshot), markdown draft (direct read), or code diff. A fresh judge subagent reasons first (strengths/weaknesses/improvements/reasoning), score last, with calibration anchors and iteration memory for improve-until-N loops. | `/score` the landing page, then a goal loop "repeat until 9/10" — the judge drives design/writing iteration. |
 
 ### Intents (spec-driven workflow)
 
