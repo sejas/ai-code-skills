@@ -81,6 +81,7 @@ Lightweight ticketing inside `~/claude.nosync/intents/`. Each intent is a markdo
 | `todo` | Adds a task to Things 3 via the `things:///` URL scheme. Voice-style: "todo: pick up groceries". |
 | `context-window-statusline` | Sets up the Claude Code footer to show context window usage, token counts, and session cost. One-shot install. |
 | `sync-skills` | Mirrors edited skills from `~/.claude/skills/<name>/` to a configurable public skills repo. Reads the `~/.claude/.skills-dirty` marker written by the `skill-dirty-marker.sh` hook, sanitizes personal IDs and scans for secrets, then commits + pushes. Config at `~/.claude/skills/sync-skills/config.json` (repo path, branch, personal-identifier list). I run `/sync-skills` after editing local skills to push the changes here. |
+| `mac-cleanup` | Frees disk space on macOS: scans for space hogs, sorts them into risk buckets (regenerable caches / app data / personal media / backups), offloads irreplaceable media + deduped WordPress backups to remote storage (e.g. Hetzner Storage Box), and trashes only what regenerates. Ships tested scripts (`scan-disk.sh`, `offload-retry.sh` with SSH-drop retry, `backup-dedup.py` for latest-per-site), plus a macOS-quirks reference (bash 3.2, openrsync, `trash` vs `rm`). "Clean up my Mac" / "my disk is full". |
 
 ## Hooks
 
